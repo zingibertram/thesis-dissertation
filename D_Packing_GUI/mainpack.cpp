@@ -2,6 +2,7 @@
 #include "lbounds.h"
 #include "fragmentation.h"
 #include "packing.h"
+#include "mainpack.h"
 
 #include <iostream>
 #include <iomanip>
@@ -9,12 +10,20 @@
 
 using namespace std;
 
-int mainPacking(char *filename)
+void mainPacking(char *filename)
 {
-    FigureVariantList data;
     FigureList fs;
     fs = readFile(filename);
 
+    lowBounds(fs);
+    cout << "\nPACK square " << packing(fs) << endl;
+
+    cout << "\n/END of program\n";
+}
+
+void lowBounds(FigureList fs)
+{
+    FigureVariantList data;
     data = figureFragmentation(fs);
 
     DoubleList dff1, dff2, dff3, dff4;
@@ -52,17 +61,12 @@ int mainPacking(char *filename)
     }
 
     //fclose(stdout);
-    cout << "\n/END of program\n";
+}
 
-//---------------------------------------------------------------
-
-    CortageXY f1 = figureCortage(fs[0]);
-    Cortage x1 = f1.first;
-    Cortage y1 = f1.second;
-    CortageXY f2 = figureCortage(fs[1]);
-    Cortage x2 = f2.first;
-    Cortage y2 = f2.second;
-    Cortage res1 = insertCortage(x1, x2);
-    Cortage res2 = insertCortage(x2, x1);
-    Cortage sum_ = sum(res1, res2);
+double packing(FigureList fs)
+{
+    CortageList corls = figuresToCortage(fs);
+    TupleCoord tc = packCortage(corls, fs);
+    double square = squarePacking(tc, fs);
+    return square;
 }

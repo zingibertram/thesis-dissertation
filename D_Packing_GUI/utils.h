@@ -19,7 +19,8 @@ typedef QPair<Figure, BoolGrid> Quantum;
 typedef QPair<double, double> TupleCoordLength; // (coord, width)
 typedef QList<TupleCoordLength> Cortage;
 typedef QPair<Cortage, Cortage> CortageXY;
-typedef QList<Cortage> CortageList;
+typedef QList<CortageXY> CortageList;
+typedef QPair<DoubleList, DoubleList> TupleCoord; // ([x ccoords], [y coords])
 
 extern const double eps;
 
