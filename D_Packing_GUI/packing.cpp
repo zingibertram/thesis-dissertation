@@ -1,81 +1,105 @@
 #include "packing.h"
-#include "fragmentation.h"
 
-#include <iostream>
-
-using namespace std;
-
-const double W = 1.5;
-const double L = INT_MAX;
-
-CortageXY figureCortage(Figure f)
+FigurePacking::FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, DoubleGrid y, double w, double l)
 {
-    ListXY xy = gridNodes(f);
-    DoubleList x = xy.first;
-    DoubleList y = xy.second;
-    Quantum q = quantumFragmentation(xy, f);
-    BoolGrid grid = q.second;
-
-    Cortage cortx;
-    for (int i = 0; i < x.count() - 1; ++i)
-    {
-        double xi = x[i + 1];
-        double h = 0.0;
-        for (int j = 0; j < y.count() - 1; ++j)
-        {
-            if (grid[i][j])
-            {
-                h += y[j + 1] - y[j];
-            }
-        }
-        cortx.append(TupleCoordLength(xi, h));
-    }
-    Cortage corty;
-    for (int i = 0; i < y.count() - 1; ++i)
-    {
-        double w = 0.0;
-        double yi = y[i + 1];
-        for (int j = 0; j < x.count() - 1; ++j)
-        {
-            if (grid[j][i])
-            {
-                w += x[j + 1] - x[j];
-            }
-        }
-        corty.append(TupleCoordLength(yi, w));
-    }
-
-    return CortageXY(cortx, corty);
+    source = fs;
+    grids = gs;
+    xGrid = x;
+    yGrid = y;
+    stripWidth = w;
+    stripLength = l;
+    count = fs.count();
 }
 
-CortageList figuresToCortage(FigureList fs)
+//void FigurePacking::figureCortage(BoolGrid grid, DoubleList x, DoubleList y)
+//{
+//    Cortage cortx;
+//    for (int i = 0; i < x.count() - 1; ++i)
+//    {
+//        double xi = x[i + 1];
+//        double h = 0.0;
+//        for (int j = 0; j < y.count() - 1; ++j)
+//        {
+//            if (grid[i][j])
+//            {
+//                h += y[j + 1] - y[j];
+//            }
+//        }
+//        cortx.append(TupleCoordLength(xi, h));
+//    }
+//    xCortage.append(cortx);
+
+//    Cortage corty;
+//    for (int i = 0; i < y.count() - 1; ++i)
+//    {
+//        double w = 0.0;
+//        double yi = y[i + 1];
+//        for (int j = 0; j < x.count() - 1; ++j)
+//        {
+//            if (grid[j][i])
+//            {
+//                w += x[j + 1] - x[j];
+//            }
+//        }
+//        corty.append(TupleCoordLength(yi, w));
+//    }
+//    yCortage.append(corty);
+//}
+
+Cortage FigurePacking::figureToCortage(BoolGrid grid, DoubleList coor, DoubleList width, bool xy)
 {
-    CortageList res;
-
-    for (int i = 0; i< fs.length(); ++i)
+    Cortage cort;
+    double coord, w;
+    int fidx, sidx;
+    for (int i = 0; i < coor.count() - 1; ++i)
     {
-        res.append(figureCortage(fs[i]));
+        coord = coor[i + 1];
+        w = 0.0;
+        for (int j = 0; j < width.count() - 1; ++j)
+        {
+            if (xy)
+            {
+                fidx = i;
+                sidx = j;
+            }
+            else
+            {
+                fidx = j;
+                sidx = i;
+            }
+            if (grid[fidx][sidx])
+            {
+                w += width[j + 1] - width[j];
+            }
+        }
+        cort.append(TupleCoordLength(coord, w));
     }
-
-    return res;
+    return cort;
 }
 
-TupleCoord packCortage(CortageList ls, FigureList fs)
+void FigurePacking::figuresToCortage()
 {
-    CortageXY xynull = ls[0];
-    Cortage xres = xynull.first;
-    Cortage yres = xynull.second;
-    DoubleList xc, yc;
-    xc.append(0.0);
-    yc.append(0.0);
+    for (int i = 0; i < count; ++i)
+    {
+        xCortage.append(this->figureToCortage(grids[i], xGrid[i], yGrid[i], true));
+        yCortage.append(this->figureToCortage(grids[i], yGrid[i], xGrid[i], false));
+    }
+}
+
+void FigurePacking::packCortage()
+{
+    Cortage xres = xCortage[0];
+    Cortage yres = yCortage[0];
+    xPos.append(0.0);
+    yPos.append(0.0);
 
     Cortage newx, newy,  xcor, ycor, newxres, newyres;
     DoubleList cortXCoords, cortYCoords;
     double figx, figy;
-    for (int i = 1; i < ls.count(); ++i)
+    for (int i = 1; i < count; ++i)
     {
-        xcor = ls[i].first;
-        ycor = ls[i].second;
+        xcor = xCortage[i];
+        ycor = yCortage[i];
         cortXCoords = getCortageCoords(xres);
         cortYCoords = getCortageCoords(yres);
 
@@ -84,7 +108,7 @@ TupleCoord packCortage(CortageList ls, FigureList fs)
         int num = 0;
         do
         {
-            if ((!num || !(num % 2)) && j < cortXCoords.count())
+            if (j < cortXCoords.count())
             {
                 figx = -1.0;
                 for (++j; j < cortXCoords.count(); ++j)
@@ -98,7 +122,7 @@ TupleCoord packCortage(CortageList ls, FigureList fs)
                         newx = xcor;
                     }
                     newxres = sum(xres, newx);
-                    if (checkSize(newxres, W, L))
+                    if (checkSize(newxres, stripWidth, stripLength))
                     {
                         figx = cortXCoords[j];
                         break;
@@ -106,48 +130,44 @@ TupleCoord packCortage(CortageList ls, FigureList fs)
                 }
             }
 
-            if ((!num || num % 2) && k < cortYCoords.count())
+            figy = -1.0;
+            for (k = cortYCoords.count() - 1; k >= 0; --k)
             {
-                figy = -1.0;
-                for (++k; k < cortYCoords.count(); ++k)
+                if (k)
                 {
-                    if (k)
-                    {
-                        newy = shiftCortage(ycor, cortYCoords[k]);
-                    }
-                    else
-                    {
-                        newy = ycor;
-                    }
-                    newyres = sum(yres, newy);
-                    if (checkSize(newyres, L, W))
-                    {
-                        figy = cortYCoords[k];
-                        break;
-                    }
+                    newy = shiftCortage(ycor, cortYCoords[k]);
+                }
+                else
+                {
+                    newy = ycor;
+                }
+                newyres = sum(yres, newy);
+                if (checkSize(newyres, stripLength, stripWidth))
+                {
+                    figy = cortYCoords[k];
+                    break;
                 }
             }
 
             ++num;
-        } while (!checkOverlap(fs, xc, yc, figx, figy, i)
-                 && (j < cortXCoords.count() || k < cortYCoords.count()));
-        if (checkOverlap(fs, xc, yc, figx, figy, i))
+        } while (!checkOverlap(figx, figy, i)
+                 && (j < cortXCoords.count() || k >= 0));
+        if (checkOverlap(figx, figy, i))
         {
-            xc.append(figx);
-            yc.append(figy);
+            xPos.append(figx);
+            yPos.append(figy);
             xres = newxres;
             yres = newyres;
         }
         if (figx < 0.0 || figy < 0.0)
         {
-            xc.append(-1.0);
-            yc.append(-1.0);
+            xPos.append(-1.0);
+            yPos.append(-1.0);
         }
     }
-    return TupleCoord(xc, yc);
 }
 
-DoubleList getCortageCoords(Cortage cort)
+DoubleList FigurePacking::getCortageCoords(Cortage cort)
 {
     DoubleList res;
     res.append(0.0);
@@ -158,7 +178,7 @@ DoubleList getCortageCoords(Cortage cort)
     return res;
 }
 
-Cortage shiftCortage(Cortage c, double shift)
+Cortage FigurePacking::shiftCortage(Cortage c, double shift)
 {
     Cortage res;
     res.append(TupleCoordLength(shift, 0.0));
@@ -169,7 +189,7 @@ Cortage shiftCortage(Cortage c, double shift)
     return res;
 }
 
-Cortage sum(Cortage c1, Cortage c2)
+Cortage FigurePacking::sum(Cortage c1, Cortage c2)
 {
     Cortage res;
 
@@ -193,24 +213,15 @@ Cortage sum(Cortage c1, Cortage c2)
 
     Cortage insc1 = insertCortage(c1, c2);
     Cortage insc2 = insertCortage(c2, c1);
-    if (insc1.count() != insc2.count())
-    {
-        cout << "WARNING: different inserting!" << endl;
-    }
     for (int i = 0; i < insc1.count(); ++i)
     {
-        if (tupleCompare(insc1[i], insc2[i]))
-        {
-            cout << "WARNING: not equal! " << i << endl;
-        }
         res.append(TupleCoordLength(insc1[i].first, insc1[i].second + insc2[i].second));
     }
-//    printCortage(res);
 
     return res;
 }
 
-Cortage insertCortage(Cortage src, Cortage ins)
+Cortage FigurePacking::insertCortage(Cortage src, Cortage ins)
 {
     Cortage res(src);
 
@@ -248,7 +259,7 @@ Cortage insertCortage(Cortage src, Cortage ins)
 }
 
 // необходимое условие
-bool checkSize(Cortage x, double w, double l)
+bool FigurePacking::checkSize(Cortage x, double w, double l)
 {
     TupleCoordLength tx = x[x.count() - 1];
 
@@ -268,13 +279,13 @@ bool checkSize(Cortage x, double w, double l)
 }
 
 // достаточное условие
-bool checkOverlap(FigureList fs, DoubleList posx, DoubleList posy, double nx, double ny, int cnt)
+bool FigurePacking::checkOverlap(double nx, double ny, int cnt)
 {
     if (nx < 0.0 || ny < 0.0)
     {
         return false;
     }
-    Figure checkingFigure = fs[cnt];
+    Figure checkingFigure = source[cnt];
     Figure f;
 
     bool bxj, bxk, byj, byk;
@@ -286,7 +297,7 @@ bool checkOverlap(FigureList fs, DoubleList posx, DoubleList posy, double nx, do
 
     for (int i = 0; i < cnt; ++i)
     {
-        f = fs[i];
+        f = source[i];
         for (int j = 0; j < checkingFigure.count(); ++j)
         {
             rj = checkingFigure[j];
@@ -297,8 +308,8 @@ bool checkOverlap(FigureList fs, DoubleList posx, DoubleList posy, double nx, do
             for (int k = 0; k < f.count(); ++k)
             {
                 rk = f[k];
-                xk = rk.x() + posx[i];
-                yk = rk.y() + posy[i];
+                xk = rk.x() + xPos[i];
+                yk = rk.y() + yPos[i];
                 wk = rk.width();
                 hk = rk.height();
 
@@ -318,33 +329,29 @@ bool checkOverlap(FigureList fs, DoubleList posx, DoubleList posy, double nx, do
     return true;
 }
 
-double squarePacking(TupleCoord tc, FigureList fs)
+double FigurePacking::squarePacking()
 {
-    DoubleList x = tc.first;
-    DoubleList y = tc.second;
-    int cnt = fs.count(); // количество фигур и элементов в ч и у совпадает
-
     double w = 0.0;
     double h = 0.0;
     Figure f;
     QRectF r;
     double s;
-    for (int i = 0; i < cnt; ++i)
+    for (int i = 0; i < count; ++i)
     {
-        if (x[i] >= 0.0 && y[i] >= 0.0)
+        if (xPos[i] >= 0.0 && yPos[i] >= 0.0)
         {
-            f = fs[i];
+            f = source[i];
             for (int j = 0; j < f.count(); ++j)
             {
                 r = f[j];
 
-                s = r.x() + r.width() + x[i];
+                s = r.x() + r.width() + xPos[i];
                 if (epsCompare(s, w))
                 {
                     w = s;
                 }
 
-                s = r.y() + r.height() + y[i];
+                s = r.y() + r.height() + yPos[i];
                 if (epsCompare(s, h))
                 {
                     h = s;
@@ -353,4 +360,20 @@ double squarePacking(TupleCoord tc, FigureList fs)
         }
     }
     return w * h;
+}
+
+DoubleList FigurePacking::xPositions()
+{
+    return xPos;
+}
+
+DoubleList FigurePacking::yPositions()
+{
+    return yPos;
+}
+
+void FigurePacking::pack()
+{
+    this->figuresToCortage();
+    this->packCortage();
 }

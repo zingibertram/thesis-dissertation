@@ -22,8 +22,7 @@ HEADERS  += mainwindow.h \
     utils.h \
     packing.h \
     mainpack.h \
-    lbounds.h \
-    fragmentation.h
+    lbounds.h
 
 FORMS    += mainwindow.ui
 

@@ -3,10 +3,17 @@
 
 #include "utils.h"
 
-DoubleList dff_1(FigureVariantList data);
-DoubleList dff_2(FigureVariantList data);
-DoubleList dff_3(FigureVariantList data);
-DoubleList dff_4(FigureVariantList data);
+class LowBounds
+{
+public:
+    LowBounds(FigureVariantList d);
+    DoubleList dff_1();
+    DoubleList dff_2();
+    DoubleList dff_3();
+    DoubleList dff_4();
 
+private:
+    FigureVariantList data;
+};
 
 #endif // LBOUNDS_H

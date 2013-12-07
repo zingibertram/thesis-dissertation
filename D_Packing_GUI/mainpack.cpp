@@ -1,72 +1,138 @@
 #include "utils.h"
 #include "lbounds.h"
-#include "fragmentation.h"
 #include "packing.h"
 #include "mainpack.h"
 
 #include <iostream>
-#include <iomanip>
 #include <stdio.h>
+#include <time.h>
 
 using namespace std;
 
-void mainPacking(char *filename)
+Packing::Packing(char *filename)
 {
-    FigureList fs;
-    fs = readFile(filename);
-
-    lowBounds(fs);
-    cout << "\nPACK square " << packing(fs) << endl;
-
-    cout << "\n/END of program\n";
+    this->readFile(filename);
+    fCount = source.count();
+    stripLength = INT_MAX;
+    this->figureFragmentation();
+    this->figuresRect();
 }
 
-void lowBounds(FigureList fs)
+void Packing::readFile(char *filename)
 {
-    FigureVariantList data;
-    data = figureFragmentation(fs);
-
-    DoubleList dff1, dff2, dff3, dff4;
-
-    //freopen("result.txt", "w", stdout);
-    const int PRE = 7;
-    const int WID = 10;
-    cout.precision(PRE);
-    dff1 = dff_1(data);
-    cout << "DFF is u^(k)    ";
-    for (int i = 0; i < dff1.count(); ++i)
+    source.clear();
+    freopen(filename, "r", stdin);
+    int num;
+    cin >> num;
+    double k, x, y, w, h;
+    Figure f;
+    for (int i = 0; i < num; ++i)
     {
-        cout << setw(WID) << dff1[i] << " ";
+        f.clear();
+        cin >> k;
+        for (int j = 0; j < k; ++j)
+        {
+            cin >> x >> y >> w >> h;
+            f.append(QRectF(x, y, w, h));
+        }
+        source.append(f);
     }
-
-    dff2 = dff_2(data);
-    cout << "\nDFF is U^(eps)  ";
-    for (int i = 0; i < dff2.count(); ++i)
-    {
-        cout << setw(WID) << dff2[i] << " ";
-    }
-
-    dff3 = dff_3(data);
-    cout << "\nDFF is fi^(eps) ";
-    for (int i = 0; i < dff3.count(); ++i)
-    {
-        cout << setw(WID) << dff3[i] << " ";
-    }
-
-    dff4 = dff_4(data);
-    cout << "\nSimple square   ";
-    for (int i = 0; i < dff4.count(); ++i)
-    {
-        cout << setw(WID) << dff4[i] << " ";
-    }
-
-    //fclose(stdout);
+    cin >> stripWidth;
 }
 
-double packing(FigureList fs)
+void Packing::mainPacking()
 {
-    CortageList corls = figuresToCortage(fs);
-    TupleCoord tc = packCortage(corls, fs);
-    double square = squarePacking(tc, fs);
-    return square;
+    lowBounds();
+    packing();
+}
+
+void Packing::lowBounds()
+{
+    LowBounds lb(data);
+    dff1 = lb.dff_1();
+    dff2 = lb.dff_2();
+    dff3 = lb.dff_3();
+    dff4 = lb.dff_4();
+}
+
+void Packing::packing()
+{
+    FigurePacking pack(source, grids, xGrid, yGrid, stripWidth, stripLength);
+    pack.pack();
+    xCoor = pack.xPositions();
+    yCoor = pack.yPositions();
+    square = pack.squarePacking();
+}
+
+void Packing::displaySource(QGraphicsScene *gs)
+{
+    double shift = 0.2;
+    double y = 0.0;
+    QRectF expanded;
+    QPen b(Qt::black);
+    QBrush g(QColor(0, 255, 127));
+    QBrush r(QColor(255, 36, 0));
+    for (int i = 0; i < fCount; ++i)
+    {
+        expanded = expand(figuresBound[i], MULT);
+        expanded.moveTop(y * MULT);
+        gs->addRect(expanded, b, g);
+        displayFigure(gs, source[i], 0.0, y, MULT, b, r);
+        y += figuresBound[i].height() + shift;
+    }
+    gs->setSceneRect(0.0, 0.0, stripWidth * MULT, (y - shift) * MULT);
+    gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
+}
+
+void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
+{
+    QString num;
+    tw->setRowCount(5);
+    tw->setColumnCount(data.count() + 1);
+    tw->setHorizontalHeaderItem(0, new QTableWidgetItem(QString::fromLocal8Bit("Функция")));
+    tw->setHorizontalHeaderItem(1, new QTableWidgetItem(QString::fromLocal8Bit("Исходное разбиение")));
+    tw->setHorizontalHeaderItem(2, new QTableWidgetItem(QString::fromLocal8Bit("Минимальное разбиение")));
+    tw->setHorizontalHeaderItem(3, new QTableWidgetItem(QString::fromLocal8Bit("Максимальное разбиение")));
+    tw->setItem(0, 0, new QTableWidgetItem(QString::fromLocal8Bit("u^(k)")));
+    tw->setItem(1, 0, new QTableWidgetItem(QString::fromLocal8Bit("fi^eps")));
+    tw->setItem(2, 0, new QTableWidgetItem(QString::fromLocal8Bit("U^eps")));
+    tw->setItem(3, 0, new QTableWidgetItem(QString::fromLocal8Bit("Площадь")));
+    tw->setItem(4, 0, new QTableWidgetItem(QString::fromLocal8Bit("Площадь полосы")));
+    tw->setItem(4, 1, new QTableWidgetItem(num.setNum(square)));
+    for (int i = 0; i < data.count(); ++i)
+    {
+        tw->setItem(0, i + 1, new QTableWidgetItem(num.setNum(dff1[i])));
+        tw->setItem(1, i + 1, new QTableWidgetItem(num.setNum(dff2[i])));
+        tw->setItem(2, i + 1, new QTableWidgetItem(num.setNum(dff3[i])));
+        tw->setItem(3, i + 1, new QTableWidgetItem(num.setNum(dff4[i])));
+    }
+
+    double w, h;
+    double width = 0.0;
+    double height = 0.0;
+    QPen b(Qt::black);
+    QPen s(QColor(255, 36, 0));
+    QBrush r(QColor(255, 36, 0));
+    QRectF expanded;
+    srand((unsigned)time(0));
+    for (int i = 0; i < fCount; ++i)
+    {
+        if (epsCompare(xCoor[i], 0.0) > -1 && epsCompare(yCoor[i], 0.0) > -1)
+        {
+            displayFigure(gs, source[i], xCoor[i], yCoor[i], MULT, b, QBrush(randColor()));
+            expanded = expand(figuresBound[i], MULT);
+            w = expanded.x() + expanded.width() + xCoor[i] * MULT;
+            if (w > width)
+            {
+                width = w;
+            }
+            h = expanded.y() + expanded.height() + yCoor[i] * MULT;
+            if (h > height)
+            {
+                height = h;
+            }
+        }
+    }
+    gs->setSceneRect(0.0, 0.0, width, height);
+    gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
 }

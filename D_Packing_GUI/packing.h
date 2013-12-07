@@ -3,15 +3,42 @@
 
 #include "utils.h"
 
-CortageXY figureCortage(Figure f);
-Cortage sum(Cortage c1, Cortage c2);
-Cortage insertCortage(Cortage src, Cortage ins);
-CortageList figuresToCortage(FigureList fs);
-TupleCoord packCortage(CortageList ls, FigureList fs);
-bool checkSize(Cortage x, double w, double l);
-bool checkOverlap(FigureList fs, DoubleList posx, DoubleList posy, double nx, double ny, int cnt);
-double squarePacking(TupleCoord tc, FigureList fs);
-DoubleList getCortageCoords(Cortage cort);
-Cortage shiftCortage(Cortage c, double shift);
+typedef QList<TupleCoordLength> Cortage;
+typedef QList<Cortage> CortageList;
+
+class FigurePacking
+{
+public:
+    FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, DoubleGrid y, double w, double l);
+    double squarePacking();
+    DoubleList xPositions();
+    DoubleList yPositions();
+    void pack();
+
+private:
+    void figuresToCortage();
+//    void figureCortage(BoolGrid grid, DoubleList x, DoubleList y);
+    Cortage figureToCortage(BoolGrid grid, DoubleList coor, DoubleList width, bool xy);
+    Cortage sum(Cortage c1, Cortage c2);
+    Cortage insertCortage(Cortage src, Cortage ins);
+    void packCortage();
+    bool checkSize(Cortage x, double w, double l);
+    bool checkOverlap(double nx, double ny, int cnt);
+    DoubleList getCortageCoords(Cortage cort);
+    Cortage shiftCortage(Cortage c, double shift);
+
+    FigureList source;
+    BoolGridList grids;
+    DoubleGrid xGrid;
+    DoubleGrid yGrid;
+    double stripWidth;
+    double stripLength;
+    int count;
+    DoubleList xPos;
+    DoubleList yPos;
+    CortageList xCortage;
+    CortageList yCortage;
+    double square;
+};
 
 #endif // PACKING_H

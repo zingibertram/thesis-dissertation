@@ -1,68 +1,29 @@
-#include "fragmentation.h"
+#include "mainpack.h"
 
 #include <math.h>
-#include <iostream>
 
 using namespace std;
 
-FigureVariantList figureFragmentation(FigureList figure)
+void Packing::figureFragmentation()
 {
-    FigureVariantList res;
     FigureList quantFragmentation;
     FigureList maxFragmentation;
-    Quantum q;
     DoubleList x, y;
 
-    for (int i = 0; i < figure.count(); ++i)
+    for (int i = 0; i < source.count(); ++i)
     {
-        ListXY xy = gridNodes(figure[i]);
-        x = xy.first;
-        y = xy.second;
-        q = quantumFragmentation(xy, figure[i]);
-
-//        QRectF back(0, 0, x[x.count() - 1], y[y.count() - 1]);
-//        showRect(q.first, back);
-        printFigureGrid(q.second, x.count() - 1, y.count() - 1);
-
-        quantFragmentation.append(q.first);
-        maxFragmentation.append(maxFigure(Field(xy, q.second)));
-
-//        deleteGrid(q.second, x.count());
+        this->gridNodes(source[i]);
+        x = xGrid[i];
+        y = yGrid[i];
+        quantFragmentation.append(quantumFragmentation(x, y, source[i]));
+        maxFragmentation.append(maxFigure(x, y, grids[i]));
     }
-    res.append(figure);
-    res.append(quantFragmentation);
-    res.append(maxFragmentation);
-    return res;
+    data.append(source);
+    data.append(quantFragmentation);
+    data.append(maxFragmentation);
 }
 
-void insertSorting(DoubleList *l, double d)
-{
-    double li;
-    for (int i = 0; i < l->count(); i++)
-    {
-        li = l->operator [](i);
-        if (fabs(li - d) <= eps)
-        {
-            return;
-        }
-
-        if (li > d /*+ eps*/)
-        {
-            l->insert(i, d);
-            break;
-        }
-        else
-        {
-            if (i == l->count() - 1)
-            {
-                l->insert(i + 1, d);
-                break;
-            }
-        }
-    }
-}
-
-ListXY gridNodes(Figure f)
+void Packing::gridNodes(Figure f)
 {
     DoubleList x;
     DoubleList y;
@@ -86,28 +47,12 @@ ListXY gridNodes(Figure f)
         insertSorting(&y, yt);
         insertSorting(&y, yb);
     }
-//    for (int i = 0; i < x.count(); ++i)
-//    {
-//        cout << x[i] << " ";
-//    }
-//    cout << endl;
-//    for (int i = 0; i < y.count(); ++i)
-//    {
-//        cout << y[i] << " ";
-//    }
-//    cout << endl;
-    return ListXY(x, y);
+    xGrid.append(x);
+    yGrid.append(y);
 }
 
-QRectF rectByLines(double l, double r, double t, double b)
+Figure Packing::quantumFragmentation(DoubleList x, DoubleList y, Figure f)
 {
-    return QRectF(l, t, r - l, b - t);
-}
-
-Quantum quantumFragmentation(ListXY xy, Figure f)
-{
-    DoubleList x = xy.first;
-    DoubleList y = xy.second;
     double w, h;
     Figure res;
     QRectF rectSource, rectGrid;
@@ -133,16 +78,13 @@ Quantum quantumFragmentation(ListXY xy, Figure f)
             }
         }
     }
-    return Quantum(res, square);
+    grids.append(square);
+    return res;
 }
 
-Figure maxFigure(Field q)
+Figure Packing::maxFigure(DoubleList x, DoubleList y, BoolGrid grid)
 {
     Figure res;
-    ListXY xy = q.first;
-    bool **grid = q.second;
-    DoubleList x = xy.first;
-    DoubleList y = xy.second;
 
     int xSqrCnt = x.count() - 1;
     int ySqrCnt = y.count() - 1;
@@ -248,4 +190,12 @@ Figure maxFigure(Field q)
     delete gridSep;
 
     return res;
+}
+
+void Packing::figuresRect()
+{
+    for (int i = 0; i < fCount; ++i)
+    {
+        figuresBound.append(rectByFigure(source[i]));
+    }
 }

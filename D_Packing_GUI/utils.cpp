@@ -3,36 +3,79 @@
 #include <stdio.h>
 #include <math.h>
 #include <iostream>
+#include <time.h>
 
-#include <QtGui/QApplication>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QDebug>
 
 using namespace std;
 
 const double eps = 0.0001;
 
-FigureList readFile(char *filename)
+// Двойственные функции
+
+double dff_1_func(double x, int k)
 {
-    freopen(filename, "r", stdin);
-    int num;
-    cin >> num;
-    double k, x, y, w, h;
-    Figure f;
-    FigureList res;
-    for (int i = 0; i < num; ++i)
+    double res = 0;
+    double u = x * (k + 1);
+    if (fabs((int)u - u) < eps)
     {
-        f.clear();
-        cin >> k;
-        for (int j = 0; j < k; ++j)
-        {
-            cin >> x >> y >> w >> h;
-            f.append(QRectF(x, y, w, h));
-        }
-        res.append(f);
+        res = x;
+    }
+    else
+    {
+        res = (int)u / (double)k;
     }
     return res;
 }
+
+double dff_2_func(double x, double e)
+{
+    // 0 <= e <= 0.5
+    double res = 0;
+    if (x > 1.0 - e)
+    {
+        res = 1;
+    }
+    else
+    {
+        if (e <= x)
+        {
+            res = x;
+        }
+        else
+        {
+            res = 0;
+        }
+    }
+    return res;
+}
+
+double dff_3_func(double x, double e)
+{
+
+    // 0 <= e < 0.5
+    double res = 0;
+    if (x > 0.5)
+    {
+        res = 1.0 - ((int)((1.0 - x) / e)) / ((double)((int)(1.0 / e)));
+    }
+    else
+    {
+        if (e <= x)
+        {
+            res = 1.0 / (double)((int)(1.0 / e));
+        }
+        else
+        {
+            res = 0;
+        }
+    }
+    return res;
+}
+
+
 
 void printFigureGrid(BoolGrid grid, int xcnt, int ycnt)
 {
@@ -68,6 +111,11 @@ double rectSquare(QRectF r)
     return r.width() * r.height();
 }
 
+QRectF rectByLines(double l, double r, double t, double b)
+{
+    return QRectF(l, t, r - l, b - t);
+}
+
 QRectF expand(QRectF r, double m)
 {
     double x = r.x();
@@ -77,29 +125,9 @@ QRectF expand(QRectF r, double m)
     return QRectF(x * m, y * m, w * m, h * m);
 }
 
-int showRect(Figure f, QRectF back)
+void showPacking(QGraphicsScene *gs, FigureList fs, DoubleList x, DoubleList y)
 {
-    char *c = "sdf";
-    char **args = new char*;
-    args[0] = c;
-    int a = 1;
-    QApplication app(a, &c);
-
-    QGraphicsScene gs(0, 0, 500, 500);
-    QGraphicsView gv;
-    gv.setScene(&gs);
-
-    gs.addRect(expand(back, 100), QPen(Qt::black), QBrush(Qt::green));
-
-    for (int i = 0; i < f.count(); ++i)
-    {
-        QRectF r = expand(f[i], 100);
-        gs.addRect(r, QPen(Qt::black), QBrush(Qt::red));
-    }
-
-    gv.show();
-
-    return app.exec();
+    ;
 }
 
 int epsCompare(double a, double b)
@@ -127,22 +155,69 @@ bool tupleLess(const TupleCoordLength &a, const TupleCoordLength &b)
     return tupleCompare(a, b) == -1;
 }
 
-void printCortage(Cortage c)
+void insertSorting(DoubleList *l, double d)
 {
-    cout << endl << "CORTAGE: ";
-    for (int i = 0; i < c.count(); ++i)
+    double li;
+    for (int i = 0; i < l->count(); i++)
     {
-        cout << "(" << c[i].first << ", " << c[i].second << "), ";
+        li = l->operator [](i);
+        if (fabs(li - d) <= eps)
+        {
+            return;
+        }
+
+        if (li > d /*+ eps*/)
+        {
+            l->insert(i, d);
+            break;
+        }
+        else
+        {
+            if (i == l->count() - 1)
+            {
+                l->insert(i + 1, d);
+                break;
+            }
+        }
     }
-    cout << endl;
 }
 
-void printDoubleList(DoubleList dl)
+QRectF rectByFigure(Figure f)
 {
-    cout << endl << "DOUBLE LIST: ";
-    for (int i = 0; i < dl.count(); ++i)
+    double width = 0.0;
+    double height = 0.0;
+    double w, h;
+    for (int i = 0; i < f.count(); ++i)
     {
-        cout << dl[i] << ", ";
+        w = f[i].x() + f[i].width();
+        h = f[i].y() + f[i].height();
+        if (w > width)
+        {
+            width = w;
+        }
+        if (h > height)
+        {
+            height = h;
+        }
     }
-    cout << endl;
+    return QRectF(0.0, 0.0, width, height);
+}
+
+void displayFigure(QGraphicsScene *gs, Figure f, double x, double y, double mult, QPen p, QBrush b)
+{
+    QRectF expanded;
+    for (int i = 0; i < f.count(); ++i)
+    {
+        expanded = expand(f[i], mult);
+        expanded.moveTo(x * mult + expanded.x(), y * mult + expanded.y());
+        gs->addRect(expanded, p, b);
+    }
+}
+
+QColor randColor()
+{
+    int r = rand() % 256;
+    int g = rand() % 256;
+    int b = rand() % 256;
+    return QColor(r, g, b);
 }
