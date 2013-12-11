@@ -16,13 +16,17 @@ SOURCES += main.cpp\
     packing.cpp \
     mainpack.cpp \
     lbounds.cpp \
-    fragmentation.cpp
+    fragmentation.cpp \
+    figuregenerator.cpp \
+    polygonview.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
     packing.h \
     mainpack.h \
-    lbounds.h
+    lbounds.h \
+    figuregenerator.h \
+    polygonview.h
 
 FORMS    += mainwindow.ui
 

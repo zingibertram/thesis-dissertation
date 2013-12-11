@@ -18,6 +18,8 @@ typedef QList<DoubleList> DoubleGrid;
 
 typedef QPair<double, double> TupleCoordLength; // (coord, width)
 
+typedef QPair<int, int> Position;
+
 extern const double eps;
 
 double dff_1_func(double x, int k);
@@ -37,6 +39,9 @@ int epsCompare(double a, double b);
 int tupleCompare(const TupleCoordLength &a, const TupleCoordLength &b);
 bool tupleLess(const TupleCoordLength &a, const TupleCoordLength &b);
 void insertSorting(DoubleList *l, double d);
+bool generateUnequal(DoubleList *ls);
+
+bool positionLess(Position a, Position b);
 
 QColor randColor();
 

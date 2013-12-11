@@ -79,22 +79,24 @@ double dff_3_func(double x, double e)
 
 void printFigureGrid(BoolGrid grid, int xcnt, int ycnt)
 {
+    char *str = new char[xcnt + 1];
+    str[xcnt] = 0;
     for (int i = 0; i < ycnt; ++i)
     {
         for (int j = 0; j < xcnt; ++j)
         {
             if (grid[j][i])
             {
-                cout << "X";
+                str[j] = 'X';
             }
             else
             {
-                cout << "-";
+                str[j] = '-';
             }
         }
-        cout << "\n";
+        qDebug() << str;
     }
-    cout << "\n";
+    qDebug() << "\n";
 }
 
 void deleteGrid(BoolGrid grid, int xcnt)
@@ -220,4 +222,29 @@ QColor randColor()
     int g = rand() % 256;
     int b = rand() % 256;
     return QColor(r, g, b);
+}
+
+bool generateUnequal(DoubleList *ls)
+{
+    double d;
+    d = ls->operator [](ls->count() - 1) + (rand() % 1000) / 5000.0 + 0.002;
+    if (d < 1.0 + eps)
+    {
+        ls->append(d);
+        return true;
+    }
+    return false;
+}
+
+bool positionLess(Position a, Position b)
+{
+    int ai = a.first;
+    int bi = b.first;
+    int aj = a.second;
+    int bj = b.second;
+    if (ai < bi || (ai == bi && aj < bj))
+    {
+        return true;
+    }
+    return false;
 }

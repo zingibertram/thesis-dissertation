@@ -24,7 +24,8 @@ private:
     void packCortage();
     bool checkSize(Cortage x, double w, double l);
     bool checkOverlap(double nx, double ny, int cnt);
-    DoubleList getCortageCoords(Cortage cort);
+    DoubleList getCortageCoords(Cortage src, Cortage ins);
+    DoubleList getTightCoords(Cortage src, Cortage ins);
     Cortage shiftCortage(Cortage c, double shift);
 
     FigureList source;

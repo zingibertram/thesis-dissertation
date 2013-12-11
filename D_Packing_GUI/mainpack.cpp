@@ -2,6 +2,7 @@
 #include "lbounds.h"
 #include "packing.h"
 #include "mainpack.h"
+#include "figuregenerator.h"
 
 #include <iostream>
 #include <stdio.h>
@@ -11,8 +12,10 @@ using namespace std;
 
 Packing::Packing(char *filename)
 {
-    this->readFile(filename);
+    //this->readFile(filename);
+    source = FigureGenerator::generateSource(10);
     fCount = source.count();
+    stripWidth = 1.5;
     stripLength = INT_MAX;
     this->figureFragmentation();
     this->figuresRect();
@@ -111,8 +114,6 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
     double width = 0.0;
     double height = 0.0;
     QPen b(Qt::black);
-    QPen s(QColor(255, 36, 0));
-    QBrush r(QColor(255, 36, 0));
     QRectF expanded;
     srand((unsigned)time(0));
     for (int i = 0; i < fCount; ++i)
@@ -133,6 +134,6 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
             }
         }
     }
-    gs->setSceneRect(0.0, 0.0, width, height);
+    gs->setSceneRect(0.0, 0.0, width, stripWidth * MULT);
     gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
 }

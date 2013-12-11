@@ -26,7 +26,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QGraphicsView" name="graphicsView_Source"/>
+         <widget class="PolygonView" name="graphicsView_Source"/>
         </item>
        </layout>
       </widget>
@@ -40,7 +40,7 @@
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
-          <widget class="QGraphicsView" name="graphicsView_Result"/>
+          <widget class="PolygonView" name="graphicsView_Result"/>
           <widget class="QTableWidget" name="tableWidget_Result"/>
          </widget>
         </item>
@@ -69,6 +69,13 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PolygonView</class>
+   <extends>QGraphicsView</extends>
+   <header>polygonview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

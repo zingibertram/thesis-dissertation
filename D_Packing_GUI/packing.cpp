@@ -100,8 +100,8 @@ void FigurePacking::packCortage()
     {
         xcor = xCortage[i];
         ycor = yCortage[i];
-        cortXCoords = getCortageCoords(xres);
-        cortYCoords = getCortageCoords(yres);
+        cortXCoords = this->getCortageCoords(xres, xcor);
+        cortYCoords = this->getCortageCoords(yres, ycor);
 
         int j = -1;
         int k = -1;
@@ -115,14 +115,14 @@ void FigurePacking::packCortage()
                 {
                     if (j)
                     {
-                        newx = shiftCortage(xcor, cortXCoords[j]);
+                        newx = this->shiftCortage(xcor, cortXCoords[j]);
                     }
                     else
                     {
                         newx = xcor;
                     }
-                    newxres = sum(xres, newx);
-                    if (checkSize(newxres, stripWidth, stripLength))
+                    newxres = this->sum(xres, newx);
+                    if (this->checkSize(newxres, stripWidth, stripLength))
                     {
                         figx = cortXCoords[j];
                         break;
@@ -135,14 +135,14 @@ void FigurePacking::packCortage()
             {
                 if (k)
                 {
-                    newy = shiftCortage(ycor, cortYCoords[k]);
+                    newy = this->shiftCortage(ycor, cortYCoords[k]);
                 }
                 else
                 {
                     newy = ycor;
                 }
-                newyres = sum(yres, newy);
-                if (checkSize(newyres, stripLength, stripWidth))
+                newyres = this->sum(yres, newy);
+                if (this->checkSize(newyres, stripLength, stripWidth))
                 {
                     figy = cortYCoords[k];
                     break;
@@ -150,9 +150,9 @@ void FigurePacking::packCortage()
             }
 
             ++num;
-        } while (!checkOverlap(figx, figy, i)
+        } while (!this->checkOverlap(figx, figy, i)
                  && (j < cortXCoords.count() || k >= 0));
-        if (checkOverlap(figx, figy, i))
+        if (this->checkOverlap(figx, figy, i))
         {
             xPos.append(figx);
             yPos.append(figy);
@@ -167,14 +167,40 @@ void FigurePacking::packCortage()
     }
 }
 
-DoubleList FigurePacking::getCortageCoords(Cortage cort)
+DoubleList FigurePacking::getTightCoords(Cortage src, Cortage ins)
+{
+    DoubleList res;
+
+    double buf;
+    for (int i = 0; i < src.count(); ++ i)
+    {
+        for (int j = 0; j < ins.count(); ++ j)
+        {
+            buf = src[i].first - ins[j].first;
+            if (buf > eps)
+            {
+                res.append(buf);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    return res;
+}
+
+DoubleList FigurePacking::getCortageCoords(Cortage src, Cortage ins)
 {
     DoubleList res;
     res.append(0.0);
-    for (int i = 0; i < cort.count(); ++i)
+    res.append(this->getTightCoords(src, ins));
+    for (int i = 0; i < src.count(); ++i)
     {
-        res.append(cort[i].first);
+        res.append(src[i].first);
     }
+    qSort(res);
     return res;
 }
 
@@ -211,8 +237,8 @@ Cortage FigurePacking::sum(Cortage c1, Cortage c2)
         }
     }
 
-    Cortage insc1 = insertCortage(c1, c2);
-    Cortage insc2 = insertCortage(c2, c1);
+    Cortage insc1 = this->insertCortage(c1, c2);
+    Cortage insc2 = this->insertCortage(c2, c1);
     for (int i = 0; i < insc1.count(); ++i)
     {
         res.append(TupleCoordLength(insc1[i].first, insc1[i].second + insc2[i].second));
