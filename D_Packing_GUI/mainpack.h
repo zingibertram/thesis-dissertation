@@ -10,11 +10,12 @@
 class Packing
 {
 public:
-    Packing(char *filename = "data.in");
+    Packing(char *filename = "gen.in");
     void readFile(char *filename);
     void mainPacking();
-    void displaySource(QGraphicsScene *gs);
+    void displaySource(QGraphicsScene *gs, int fragIdx);
     void displayResult(QTableWidget *tw, QGraphicsScene *gs);
+    void saveSource();
 
 private:
     void figureFragmentation();

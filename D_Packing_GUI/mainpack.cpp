@@ -15,13 +15,32 @@ using namespace std;
 
 Packing::Packing(char *filename)
 {
-    //this->readFile(filename);
-    source = FigureGenerator::generateSource(10);
+    this->readFile(filename);
+//    source = FigureGenerator::generateSource(16);
+//    this->saveSource();
+    sortSource(&source);
     fCount = source.count();
     stripWidth = 1.5;
     stripLength = INT_MAX;
     this->figureFragmentation();
     this->figuresRect();
+}
+
+void Packing::saveSource()
+{
+    freopen("gen.out", "w", stdout);
+    cout << source.count() << endl;
+    for (int f = 0; f < source.count(); ++f)
+    {
+        Figure ortho = source[f];
+        cout << ortho.count() << endl;
+        for (int r = 0; r < ortho.count(); ++r)
+        {
+            QRectF rect = ortho[r];
+            cout << rect.x() << " " << rect.y()  << " " << rect.width()  << " " << rect.height() << endl;
+        }
+    }
+    fclose(stdout);
 }
 
 void Packing::readFile(char *filename)
@@ -70,7 +89,7 @@ void Packing::packing()
     square = pack.squarePacking();
 }
 
-void Packing::displaySource(QGraphicsScene *gs)
+void Packing::displaySource(QGraphicsScene *gs, int fragIdx)
 {
     double shift = 0.2;
     double y = 0.0;
@@ -84,7 +103,7 @@ void Packing::displaySource(QGraphicsScene *gs)
         expanded = expand(figuresBound[i], MULT);
         expanded.moveTop(y * MULT);
         gs->addRect(expanded, b, g);
-        displayFigure(gs, source[i], 0.0, y, MULT, b, r);
+        displayFigure(gs, data[fragIdx][i], 0.0, y, MULT, b, r);
         y += figuresBound[i].height() + shift;
     }
     gs->setSceneRect(0.0, 0.0, stripWidth * MULT, (y - shift) * MULT);
@@ -94,7 +113,8 @@ void Packing::displaySource(QGraphicsScene *gs)
     QPainter p(&img);
     gs->render(&p);
     p.end();
-    img.save("source.png");
+    QString num;
+    img.save(QString("source%1.png").arg(num.setNum(fragIdx)));
 }
 
 void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)

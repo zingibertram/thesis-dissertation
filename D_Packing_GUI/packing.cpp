@@ -1,5 +1,8 @@
 #include "packing.h"
 
+#include <QDebug>
+#include <QTime>
+
 FigurePacking::FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, DoubleGrid y, double w, double l)
 {
     source = fs;
@@ -51,6 +54,7 @@ Cortage FigurePacking::figureToCortage(BoolGrid grid, DoubleList coor, DoubleLis
     Cortage cort;
     double coord, w;
     int fidx, sidx;
+
     for (int i = 0; i < coor.count() - 1; ++i)
     {
         coord = coor[i + 1];
@@ -115,7 +119,7 @@ void FigurePacking::packCortage()
                 {
                     if (j)
                     {
-                        newx = this->shiftCortage(xcor, cortXCoords[j]);
+                        this->shiftCortage(&newx, cortXCoords[j], cortXCoords[j - 1]);
                     }
                     else
                     {
@@ -136,7 +140,7 @@ void FigurePacking::packCortage()
             {
                 if (k)
                 {
-                    newy = this->shiftCortage(ycor, cortYCoords[k]);
+                    this->shiftCortage(&newy, cortYCoords[k], cortYCoords[k - 1]);
                 }
                 else
                 {
@@ -152,7 +156,7 @@ void FigurePacking::packCortage()
 
             ++num;
         } while (!this->checkOverlap(figx, figy, i)
-                 && (j < cortXCoords.count() || k >= 0));
+                 && (j < cortXCoords.count() || /*k >= 0*/false));
         if (this->checkOverlap(figx, figy, i))
         {
             xPos.append(figx);
@@ -214,6 +218,20 @@ Cortage FigurePacking::shiftCortage(Cortage c, double shift)
         res.append(TupleCoordLength(shift + c[i].first, c[i].second));
     }
     return res;
+}
+
+void FigurePacking::shiftCortage(Cortage *c, double shift, double prevShift)
+{
+    if ((*c)[0].second == 0)
+    {
+        c->removeAt(0);
+    }
+    c->insert(0, TupleCoordLength(shift, 0.0));
+    shift -= prevShift;
+    for (int i = 1; i < c->count(); ++i)
+    {
+        (*c)[i].first += shift;
+    }
 }
 
 Cortage FigurePacking::sum(Cortage c1, Cortage c2)
@@ -373,13 +391,13 @@ double FigurePacking::squarePacking()
                 r = f[j];
 
                 s = r.x() + r.width() + xPos[i];
-                if (epsCompare(s, w))
+                if (epsCompare(s, w) != -1)
                 {
                     w = s;
                 }
 
                 s = r.y() + r.height() + yPos[i];
-                if (epsCompare(s, h))
+                if (epsCompare(s, h) != -1)
                 {
                     h = s;
                 }
@@ -401,6 +419,10 @@ DoubleList FigurePacking::yPositions()
 
 void FigurePacking::pack()
 {
+    QTime t;
     this->figuresToCortage();
+    t.start();
     this->packCortage();
+    int ms = t.elapsed();
+    qDebug() << "Working time" << ms;
 }

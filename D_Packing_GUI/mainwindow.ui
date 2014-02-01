@@ -15,26 +15,78 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>1</number>
+    </property>
+    <property name="margin">
+     <number>2</number>
+    </property>
     <item>
      <widget class="QSplitter" name="splitter_2">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QGroupBox" name="groupBox_Source">
-       <property name="title">
-        <string>Исходные фигуры</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="PolygonView" name="graphicsView_Source"/>
-        </item>
-       </layout>
+      <widget class="QTabWidget" name="tabWidget_Source">
+       <widget class="QWidget" name="page_Source" native="true">
+        <attribute name="title">
+         <string>Source</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <property name="margin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="PolygonView" name="graphicsView_Source"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_Max">
+        <attribute name="title">
+         <string>Max</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <property name="margin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="PolygonView" name="graphicsView_Source_Max"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="page_Min">
+        <attribute name="title">
+         <string>Min</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <property name="margin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="PolygonView" name="graphicsView_Source_Min"/>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QGroupBox" name="groupBox_Result">
        <property name="title">
         <string>Результат</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>1</number>
+        </property>
+        <property name="margin">
+         <number>2</number>
+        </property>
         <item>
          <widget class="QSplitter" name="splitter">
           <property name="orientation">

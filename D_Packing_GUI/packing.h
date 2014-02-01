@@ -27,6 +27,7 @@ private:
     DoubleList getCortageCoords(Cortage src, Cortage ins);
     DoubleList getTightCoords(Cortage src, Cortage ins);
     Cortage shiftCortage(Cortage c, double shift);
+    void shiftCortage(Cortage *c, double shift, double prevShift);
 
     FigureList source;
     BoolGridList grids;

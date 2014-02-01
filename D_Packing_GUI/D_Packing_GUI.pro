@@ -32,4 +32,5 @@ FORMS    += mainwindow.ui
 
 OTHER_FILES += \
     result.txt \
-    data.in
+    data.in \
+    gen.in

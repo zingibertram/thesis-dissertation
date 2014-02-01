@@ -108,10 +108,7 @@ DoubleList LowBounds::dff_4()
         s = 0;
         for (int l = 0; l < data[i].count(); ++l)
         {
-            for (int j = 0; j < data[i][l].count(); ++j)
-            {
-                s += data[i][l][j].width() * data[i][l][j].height();
-            }
+            s += figureSquareReal(data[i][l]);
         }
         cnt.append(s);
     }

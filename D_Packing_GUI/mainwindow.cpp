@@ -17,10 +17,16 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_Calculate_clicked()
 {
     model.mainPacking();
-    QGraphicsScene *gsSrc = new QGraphicsScene();
+    QGraphicsScene *gsSrc0 = new QGraphicsScene();
+    QGraphicsScene *gsSrc1 = new QGraphicsScene();
+    QGraphicsScene *gsSrc2 = new QGraphicsScene();
     QGraphicsScene *gsRes = new QGraphicsScene();
-    model.displaySource(gsSrc);
+    model.displaySource(gsSrc0, 0);
+    model.displaySource(gsSrc1, 1);
+    model.displaySource(gsSrc2, 2);
     model.displayResult(ui->tableWidget_Result, gsRes);
-    ui->graphicsView_Source->setScene(gsSrc);
+    ui->graphicsView_Source->setScene(gsSrc0);
+    ui->graphicsView_Source_Min->setScene(gsSrc1);
+    ui->graphicsView_Source_Max->setScene(gsSrc2);
     ui->graphicsView_Result->setScene(gsRes);
 }

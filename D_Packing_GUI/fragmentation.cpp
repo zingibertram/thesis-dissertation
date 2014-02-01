@@ -15,8 +15,8 @@ void Packing::figureFragmentation()
         this->gridNodes(source[i]);
         x = xGrid[i];
         y = yGrid[i];
-        quantFragmentation.append(quantumFragmentation(x, y, source[i]));
-        maxFragmentation.append(maxFigure(x, y, grids[i]));
+        quantFragmentation.append(this->quantumFragmentation(x, y, source[i]));
+        maxFragmentation.append(this->maxFigure(x, y, copyGrid(grids[i], x.count() - 1, y.count() - 1)));
     }
     data.append(source);
     data.append(quantFragmentation);
@@ -65,11 +65,11 @@ Figure Packing::quantumFragmentation(DoubleList x, DoubleList y, Figure f)
         {
             w = x[i + 1] - x[i];
             h = y[j + 1] - y[j];
+            rectGrid = QRectF(x[i], y[j], w, h);
             for (int k = 0; k < f.count(); ++k)
             {
                 rectSource = f[k];
-                rectGrid = rectByLines(x[i], x[i + 1], y[j], y[j + 1]);
-                if (rectSource.contains(rectGrid))
+                if (aContainB(rectSource, rectGrid))//rectSource.contains(rectGrid))
                 {
                     res.append(rectGrid);
                     square[i][j] = true;

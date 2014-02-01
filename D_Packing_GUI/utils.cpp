@@ -9,6 +9,7 @@
 #include <QGraphicsScene>
 #include <QDebug>
 #include <qmath.h>
+#include <qalgorithms.h>
 
 using namespace std;
 
@@ -100,6 +101,18 @@ void printFigureGrid(BoolGrid grid, int xcnt, int ycnt)
     qDebug() << "\n";
 }
 
+void printFigureData(Figure f)
+{
+
+    QRectF r;
+    qDebug() << f.count();
+    for (int i = 0; i < f.count(); ++i)
+    {
+        r = f[i];
+        qDebug() << r.x() << " " << r.y()  << " " << r.width()  << " " << r.height();
+    }
+}
+
 void deleteGrid(BoolGrid grid, int xcnt)
 {
     for (int i = 0; i < xcnt; ++i)
@@ -109,15 +122,10 @@ void deleteGrid(BoolGrid grid, int xcnt)
     delete grid;
 }
 
-double rectSquare(QRectF r)
-{
-    return r.width() * r.height();
-}
-
-QRectF rectByLines(double l, double r, double t, double b)
-{
-    return QRectF(l, t, r - l, b - t);
-}
+//double rectSquare(QRectF r)
+//{
+//    return r.width() * r.height();
+//}
 
 QRectF expand(QRectF r, double m)
 {
@@ -258,4 +266,58 @@ bool positionLess(Position a, Position b)
         return true;
     }
     return false;
+}
+
+bool aContainB(QRectF a, QRectF b)
+{
+    bool pos = (a.x() <= b.x() + eps) && (a.y() <= b.y() + eps);
+    bool right = (a.x() + a.width() + eps >= b.x() + b.width());
+    bool bottom = (a.y() + a.height() + eps >= b.y() + b.height());
+    bool res = pos && right && bottom;
+    return res;
+}
+
+double figureSquareReal(Figure f)
+{
+    double s = 0;
+    for (int i = 0; i < f.count(); ++i)
+    {
+        s += f[i].width() * f[i].height();
+    }
+    return s;
+}
+
+double figureSquareRect(Figure f)
+{
+    QRectF r = rectByFigure(f);
+    return r.width() * r.height();
+}
+
+bool figureLessBySquare(Figure a, Figure b)
+{
+    return figureSquareReal(a) < figureSquareReal(b);
+}
+
+bool figureLessByDensity(Figure a, Figure b)
+{
+    return figureSquareRect(a) / figureSquareReal(a) < figureSquareRect(b) / figureSquareReal(b);
+}
+
+void sortSource(FigureList *source)
+{
+    qSort(source->begin(), source->end(), figureLessByDensity);
+}
+
+BoolGrid copyGrid(BoolGrid grid, int xcnt, int ycnt)
+{
+    BoolGrid res = new bool* [xcnt];
+    for (int i = 0; i < xcnt; ++i)
+    {
+        res[i] = new bool [ycnt];
+        for (int j = 0; j < ycnt; ++j)
+        {
+            res[i][j] = grid[i][j];
+        }
+    }
+    return res;
 }

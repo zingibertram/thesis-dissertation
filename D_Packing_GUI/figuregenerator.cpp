@@ -156,6 +156,25 @@ Figure FigureGenerator::gridToFigure(BoolGrid grid, DoubleList x, DoubleList y, 
             }
         }
     }
+
+    for (int i = 0; i < res.count(); ++i)
+    {
+        for (int j = 0; j < res.count(); ++j)
+        {
+            if (epsCompare(res[i].x(), res[j].x()) != 1)
+            {
+                bool top = epsCompare(res[i].y(), res[j].y()) == 0;
+                bool bottom = epsCompare(res[i].y() + res[i].height(), res[j].y() + res[j].height()) == 0;
+                bool bordered = epsCompare(res[i].x() + res[i].width(), res[j].x()) == 0;
+                if (top && bottom && bordered)
+                {
+                    res[i] = QRectF(res[i].x(), res[i].y(), res[i].width() + res[j].width(), res[i].height());
+                    res.removeAt(j);
+                    --j;
+                }
+            }
+        }
+    }
     return res;
 }
 
