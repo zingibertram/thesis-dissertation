@@ -131,7 +131,8 @@ void FigurePacking::packCortage()
             }
 
             figy = -1.0;
-            for (k = cortYCoords.count() - 1; k >= 0; --k)
+//            for (k = cortYCoords.count() - 1; k >= 0; --k)
+            for (k = 0; k <  cortYCoords.count(); ++k)
             {
                 if (k)
                 {

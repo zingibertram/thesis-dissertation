@@ -45,4 +45,6 @@ bool positionLess(Position a, Position b);
 
 QColor randColor();
 
+double drand(int accuracy);
+
 #endif // UTILS_H

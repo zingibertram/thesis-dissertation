@@ -1,0 +1,13 @@
+INPUT(
+./release\main.o
+./release\mainwindow.o
+./release\utils.o
+./release\packing.o
+./release\mainpack.o
+./release\lbounds.o
+./release\fragmentation.o
+./release\figuregenerator.o
+./release\polygonview.o
+./release\moc_mainwindow.o
+./release\moc_polygonview.o
+);

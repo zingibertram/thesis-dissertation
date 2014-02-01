@@ -8,6 +8,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QDebug>
+#include <qmath.h>
 
 using namespace std;
 
@@ -226,14 +227,24 @@ QColor randColor()
 
 bool generateUnequal(DoubleList *ls)
 {
-    double d;
-    d = ls->operator [](ls->count() - 1) + (rand() % 1000) / 5000.0 + 0.002;
+    double d, old, p;
+    old = ls->operator [](ls->count() - 1);
+    p = drand(5);
+    d = old + p;
     if (d < 1.0 + eps)
     {
         ls->append(d);
         return true;
     }
     return false;
+}
+
+double drand(int accuracy)
+{
+    double p = qPow(10, accuracy);
+    double a = (qrand() % ((int)p + 1)) / p;
+    double b = (qrand() % 1000) / 2500.0 + 0.002;
+    return b;
 }
 
 bool positionLess(Position a, Position b)

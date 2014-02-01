@@ -16,11 +16,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_Calculate_clicked()
 {
-//    model.mainPacking();
+    model.mainPacking();
     QGraphicsScene *gsSrc = new QGraphicsScene();
     QGraphicsScene *gsRes = new QGraphicsScene();
     model.displaySource(gsSrc);
-//    model.displayResult(ui->tableWidget_Result, gsRes);
+    model.displayResult(ui->tableWidget_Result, gsRes);
     ui->graphicsView_Source->setScene(gsSrc);
-//    ui->graphicsView_Result->setScene(gsRes);
+    ui->graphicsView_Result->setScene(gsRes);
 }

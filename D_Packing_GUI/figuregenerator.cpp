@@ -33,35 +33,48 @@ DoubleList FigureGenerator::generateDoubles(int cnt)
 
 bool FigureGenerator::checkConnection(BoolGrid grid, int i, int j, int cx, int cy)
 {
+//    printFigureGrid(grid, cx, cy);
+
+    int cntx, cnty;
+    cntx = cnty = 0;
+    for (int k = 0; k < cx; ++k)
+    {
+        if (grid[k][j])
+        {
+            ++cntx;
+        }
+    }
+    for (int k = 0; k < cy; ++k)
+    {
+        if (grid[i][k])
+        {
+            ++cnty;
+        }
+    }
+    bool notOnly = (cntx > 1 && cnty > 1);
+
     bool n1, n2, n3, n4;
     bool dn1, dn2, dn3, dn4;
-//    bool nn1, nn2, nn3, nn4;
 
     n1 = (0 < i) ? grid[i - 1][j] : false;
-    n2 = (i < cx - 1) ? grid[i + 1][j] : false;
-    n3 = (0 < j) ? grid[i][j - 1] : false;
-    n4 = (j < cy - 1) ? grid[i][j + 1] : false;
-
-//    nn1 = (1 < i) ? grid[i - 2][j] : false;
-//    nn2 = (i < cx - 2) ? grid[i + 2][j] : false;
-//    nn3 = (1 < j) ? grid[i][j - 2] : false;
-//    nn4 = (j < cy - 2) ? grid[i][j + 2] : false;
+    n2 = (j < cy - 1) ? grid[i][j + 1] : false;
+    n3 = (i < cx - 1) ? grid[i + 1][j] : false;
+    n4 = (0 < j) ? grid[i][j - 1] : false;
 
     dn1 = (0 < i && j < cy - 1) ? grid[i - 1][j + 1] : false;
     dn2 = (i < cx - 1 && j < cy - 1) ? grid[i + 1][j + 1] : false;
     dn3 = (i < cx - 1 && 0 < j) ? grid[i + 1][j - 1] : false;
     dn4 = (0 < i && 0 < j) ? grid[i - 1][j - 1] : false;
 
-    bool N1, N2, N3, N4;
+    bool N1, N2, N3, N4, N5, N6;
     N1 = (n1 && n2) ? dn1 : true;
     N2 = (n2 && n3) ? dn2 : true;
     N3 = (n3 && n4) ? dn3 : true;
     N4 = (n4 && n1) ? dn4 : true;
-//    N1 = (!n1 || (dn4 || nn1 || dn1));
-//    N2 = (!n2 || (dn1 || nn2 || dn2));
-//    N3 = (!n3 || (dn2 || nn3 || dn3));
-//    N4 = (!n4 || (dn3 || nn4 || dn4));
-    return N1 && N2 && N3 && N4;
+    N5 = (n1 && n3) ? (dn4 && n4 && dn3) || (dn1 && n2 && dn2) || (dn1 && n2 && n4 && dn3) || (dn4 && n4 && n2 && dn2) : true;
+    N6 = (n2 && n4) ? (dn1 && n1 && dn4) || (dn2 && n3 && dn3) || (dn2 && n3 && n1 && dn4) || (dn3 && n3 && n1 && dn1) : true;
+
+    return (N1 && N2 && N3 && N4 && N5 && N6 && notOnly);
 }
 
 Figure FigureGenerator::gridToFigure(BoolGrid grid, DoubleList x, DoubleList y, int ce)
@@ -94,25 +107,20 @@ Figure FigureGenerator::gridToFigure(BoolGrid grid, DoubleList x, DoubleList y, 
         j = pos.second;
         if (grid[i][j] && FigureGenerator::checkConnection(grid, i, j, cx, cy))
         {
-//            if (!(j == 0 || j == cy - 1) && (i == 0 || i == cx - 1))
-//            {
-//                int tt = 90;
-//                ++tt;
-//            }
             grid[i][j] = false;
-            if (0 < i)
+            if (0 < i && grid[i - 1][j])
             {
                 possibleCells.insert(Position(i - 1, j));
             }
-            if (i < cx - 1)
+            if (i < cx - 1 && grid[i + 1][j])
             {
                 possibleCells.insert(Position(i + 1, j));
             }
-            if (0 < j)
+            if (0 < j && grid[i][j - 1])
             {
                 possibleCells.insert(Position(i, j - 1));
             }
-            if (j < cy - 1)
+            if (j < cy - 1 && grid[i][j + 1])
             {
                 possibleCells.insert(Position(i, j + 1));
             }
@@ -158,7 +166,7 @@ Figure FigureGenerator::generateFigure(int cx, int cy)
 
     cx = x.count() - 1;
     cy = y.count() - 1;
-    int ce = ((double)(cx * cy) * 0.4);
+    int ce = ((double)(cx * cy) * 0.5);
 
     BoolGrid grid = new bool* [cx];
     for (int i = 0; i < cx; ++i)
@@ -173,7 +181,7 @@ Figure FigureGenerator::generateFigure(int cx, int cy)
 
 FigureList FigureGenerator::generateSource(int cnt)
 {
-    srand((unsigned)clock());
+//    srand((unsigned)clock());
     FigureList res;
     int cx, cy;
     for (int i = 0; i < cnt; ++i)

@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <time.h>
 
+#include <QImage>
+#include <QPainter>
+
 using namespace std;
 
 Packing::Packing(char *filename)
@@ -75,6 +78,7 @@ void Packing::displaySource(QGraphicsScene *gs)
     QPen b(Qt::black);
     QBrush g(QColor(0, 255, 127));
     QBrush r(QColor(255, 36, 0));
+    QPen rp(QColor(255, 36, 0));
     for (int i = 0; i < fCount; ++i)
     {
         expanded = expand(figuresBound[i], MULT);
@@ -85,6 +89,12 @@ void Packing::displaySource(QGraphicsScene *gs)
     }
     gs->setSceneRect(0.0, 0.0, stripWidth * MULT, (y - shift) * MULT);
     gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
+
+    QImage img(gs->sceneRect().size().toSize(), QImage::Format_ARGB32);
+    QPainter p(&img);
+    gs->render(&p);
+    p.end();
+    img.save("source.png");
 }
 
 void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
@@ -120,7 +130,8 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
     {
         if (epsCompare(xCoor[i], 0.0) > -1 && epsCompare(yCoor[i], 0.0) > -1)
         {
-            displayFigure(gs, source[i], xCoor[i], yCoor[i], MULT, b, QBrush(randColor()));
+            QColor rndc = randColor();
+            displayFigure(gs, source[i], xCoor[i], yCoor[i], MULT, b/*QPen(rndc)*/, QBrush(rndc));
             expanded = expand(figuresBound[i], MULT);
             w = expanded.x() + expanded.width() + xCoor[i] * MULT;
             if (w > width)
@@ -136,4 +147,10 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
     }
     gs->setSceneRect(0.0, 0.0, width, stripWidth * MULT);
     gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
+
+    QImage img(gs->sceneRect().size().toSize(), QImage::Format_ARGB32);
+    QPainter p(&img);
+    gs->render(&p);
+    p.end();
+    img.save("result.png");
 }
