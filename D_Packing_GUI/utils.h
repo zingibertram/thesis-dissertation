@@ -33,7 +33,8 @@ QRectF rectByFigure(Figure f);
 void displayFigure(QGraphicsScene *gs, Figure f, double x, double y, double mult, QPen p, QBrush b);
 double figureSquareReal(Figure f);
 double figureSquareRect(Figure f);
-void sortSource(FigureList *source);
+void sortSource(FigureList *source, bool (*lessFunc)(Figure, Figure));
+void rotateFigure(Figure *f);
 
 //double rectSquare(QRectF r);
 QRectF expand(QRectF r, double m);
@@ -46,6 +47,8 @@ void insertSorting(DoubleList *l, double d);
 bool positionLess(Position a, Position b);
 bool figureLessBySquare(Figure a, Figure b);
 bool figureLessByDensity(Figure a, Figure b);
+bool figureLessByWidth(Figure a, Figure b);
+bool figureLessByHeight(Figure a, Figure b);
 
 bool generateUnequal(DoubleList *ls);
 QColor randColor();

@@ -303,9 +303,19 @@ bool figureLessByDensity(Figure a, Figure b)
     return figureSquareRect(a) / figureSquareReal(a) < figureSquareRect(b) / figureSquareReal(b);
 }
 
-void sortSource(FigureList *source)
+bool figureLessByWidth(Figure a, Figure b)
 {
-    qSort(source->begin(), source->end(), figureLessByDensity);
+    return rectByFigure(a).width() > rectByFigure(b).width();
+}
+
+bool figureLessByHeight(Figure a, Figure b)
+{
+    return rectByFigure(a).height() > rectByFigure(b).height();
+}
+
+void sortSource(FigureList *source, bool (*lessFunc)(Figure, Figure))
+{
+    qSort(source->begin(), source->end(), lessFunc);
 }
 
 BoolGrid copyGrid(BoolGrid grid, int xcnt, int ycnt)
@@ -320,4 +330,12 @@ BoolGrid copyGrid(BoolGrid grid, int xcnt, int ycnt)
         }
     }
     return res;
+}
+
+void rotateFigure(Figure *f)
+{
+    for (int i = 0; i < f->count(); ++i)
+    {
+        (*f)[i] = QRectF((*f)[i].y(), (*f)[i].x(), (*f)[i].height(), (*f)[i].width());
+    }
 }

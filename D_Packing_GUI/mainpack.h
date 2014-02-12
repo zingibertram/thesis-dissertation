@@ -25,6 +25,7 @@ private:
     void figuresRect();
     void packing();
     void lowBounds();
+    void prepareSource();
 
     FigureList source;
     Figure figuresBound;

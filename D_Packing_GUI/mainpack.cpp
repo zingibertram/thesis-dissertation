@@ -16,10 +16,10 @@ using namespace std;
 Packing::Packing(char *filename)
 {
     this->readFile(filename);
-//    source = FigureGenerator::generateSource(16);
-//    this->saveSource();
-    sortSource(&source);
     fCount = source.count();
+//    source = FigureGenerator::generateSource(16);
+    this->prepareSource();
+//    this->saveSource();
     stripWidth = 1.5;
     stripLength = INT_MAX;
     this->figureFragmentation();
@@ -101,12 +101,12 @@ void Packing::displaySource(QGraphicsScene *gs, int fragIdx)
     for (int i = 0; i < fCount; ++i)
     {
         expanded = expand(figuresBound[i], MULT);
-        expanded.moveTop(y * MULT);
+        expanded.moveLeft(y * MULT);
         gs->addRect(expanded, b, g);
-        displayFigure(gs, data[fragIdx][i], 0.0, y, MULT, b, r);
-        y += figuresBound[i].height() + shift;
+        displayFigure(gs, data[fragIdx][i], y, 0.0, MULT, b, r);
+        y += figuresBound[i].width() + shift;
     }
-    gs->setSceneRect(0.0, 0.0, stripWidth * MULT, (y - shift) * MULT);
+    gs->setSceneRect(0.0, 0.0, (y - shift) * MULT, stripWidth * MULT);
     gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
 
     QImage img(gs->sceneRect().size().toSize(), QImage::Format_ARGB32);
@@ -143,7 +143,7 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
     double w, h;
     double width = 0.0;
     double height = 0.0;
-    QPen b(Qt::black);
+    QPen b(Qt::black, 0);
     QRectF expanded;
     srand((unsigned)time(0));
     for (int i = 0; i < fCount; ++i)
@@ -151,7 +151,7 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
         if (epsCompare(xCoor[i], 0.0) > -1 && epsCompare(yCoor[i], 0.0) > -1)
         {
             QColor rndc = randColor();
-            displayFigure(gs, source[i], xCoor[i], yCoor[i], MULT, b/*QPen(rndc)*/, QBrush(rndc));
+            displayFigure(gs, source[i], xCoor[i], yCoor[i], MULT, b, QBrush(rndc));
             expanded = expand(figuresBound[i], MULT);
             w = expanded.x() + expanded.width() + xCoor[i] * MULT;
             if (w > width)
@@ -166,11 +166,25 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
         }
     }
     gs->setSceneRect(0.0, 0.0, width, stripWidth * MULT);
-    gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
+    gs->addRect(QRectF(0.0, 0.0, width - 1, stripWidth * MULT - 1), b, QBrush(QColor(0, 0, 0, 0)));
 
     QImage img(gs->sceneRect().size().toSize(), QImage::Format_ARGB32);
     QPainter p(&img);
     gs->render(&p);
     p.end();
     img.save("result.png");
+}
+
+void Packing::prepareSource()
+{
+    for (int i = 0; i < fCount; ++i)
+    {
+        QRectF r = rectByFigure(source[i]);
+        if (r.height() >= r.width())
+        {
+            rotateFigure(&source[i]);
+        }
+    }
+    sortSource(&source, figureLessByHeight);
+    sortSource(&source, figureLessByDensity);
 }

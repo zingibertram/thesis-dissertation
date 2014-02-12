@@ -112,11 +112,20 @@ void FigurePacking::packCortage()
         int num = 0;
         do
         {
-            if (j < cortXCoords.count())
+            if (k >= cortYCoords.count() - 1)
+            {
+                k = -1;
+            }
+            if (j < cortXCoords.count() && k == -1)
             {
                 figx = -1.0;
                 for (++j; j < cortXCoords.count(); ++j)
                 {
+                    if (i == 3 && j == cortXCoords.count() - 1)
+                    {
+                        int trrt = 90;
+                        ++trrt;
+                    }
                     if (j)
                     {
                         this->shiftCortage(&newx, cortXCoords[j], cortXCoords[j - 1]);
@@ -135,8 +144,7 @@ void FigurePacking::packCortage()
             }
 
             figy = -1.0;
-//            for (k = cortYCoords.count() - 1; k >= 0; --k)
-            for (k = 0; k <  cortYCoords.count(); ++k)
+            for (++k; k <  cortYCoords.count(); ++k)
             {
                 if (k)
                 {
@@ -156,7 +164,7 @@ void FigurePacking::packCortage()
 
             ++num;
         } while (!this->checkOverlap(figx, figy, i)
-                 && (j < cortXCoords.count() || /*k >= 0*/false));
+                 && (j < cortXCoords.count() || k < cortYCoords.count()));
         if (this->checkOverlap(figx, figy, i))
         {
             xPos.append(figx);
@@ -206,17 +214,6 @@ DoubleList FigurePacking::getCortageCoords(Cortage src, Cortage ins)
         res.append(src[i].first);
     }
     qSort(res);
-    return res;
-}
-
-Cortage FigurePacking::shiftCortage(Cortage c, double shift)
-{
-    Cortage res;
-    res.append(TupleCoordLength(shift, 0.0));
-    for (int i = 0; i < c.count(); ++i)
-    {
-        res.append(TupleCoordLength(shift + c[i].first, c[i].second));
-    }
     return res;
 }
 
@@ -404,7 +401,7 @@ double FigurePacking::squarePacking()
             }
         }
     }
-    return w * h;
+    return w * stripWidth;
 }
 
 DoubleList FigurePacking::xPositions()
