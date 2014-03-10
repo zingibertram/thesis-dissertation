@@ -194,8 +194,9 @@ Figure Packing::maxFigure(DoubleList x, DoubleList y, BoolGrid grid)
 
 void Packing::figuresRect()
 {
+    figuresBound.clear();
     for (int i = 0; i < fCount; ++i)
     {
-        figuresBound.append(rectByFigure(source[i]));
+        figuresBound << rectByFigure(source[i]);
     }
 }

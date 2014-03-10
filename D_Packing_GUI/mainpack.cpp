@@ -23,7 +23,6 @@ Packing::Packing(char *filename)
     stripWidth = 1.5;
     stripLength = INT_MAX;
     this->figureFragmentation();
-    this->figuresRect();
 }
 
 void Packing::saveSource()
@@ -82,7 +81,7 @@ void Packing::lowBounds()
 
 void Packing::packing()
 {
-    FigurePacking pack(source, grids, xGrid, yGrid, stripWidth, stripLength);
+    FigurePacking pack(source, grids, xGrid, yGrid, stripWidth, stripLength, figuresBound);
     pack.pack();
     xCoor = pack.xPositions();
     yCoor = pack.yPositions();
@@ -101,13 +100,13 @@ void Packing::displaySource(QGraphicsScene *gs, int fragIdx)
     for (int i = 0; i < fCount; ++i)
     {
         expanded = expand(figuresBound[i], MULT);
-        expanded.moveLeft(y * MULT);
+        expanded.moveTop(y * MULT);
         gs->addRect(expanded, b, g);
-        displayFigure(gs, data[fragIdx][i], y, 0.0, MULT, b, r);
-        y += figuresBound[i].width() + shift;
+        displayFigure(gs, data[fragIdx][i], 0.0, y, MULT, b, r);
+        y += figuresBound[i].height() + shift;
     }
-    gs->setSceneRect(0.0, 0.0, (y - shift) * MULT, stripWidth * MULT);
-    gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
+    gs->setSceneRect(0.0, 0.0, stripWidth * MULT, (y - shift) * MULT);
+//    gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
 
     QImage img(gs->sceneRect().size().toSize(), QImage::Format_ARGB32);
     QPainter p(&img);
@@ -148,7 +147,7 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
     srand((unsigned)time(0));
     for (int i = 0; i < fCount; ++i)
     {
-        if (epsCompare(xCoor[i], 0.0) > -1 && epsCompare(yCoor[i], 0.0) > -1)
+        if (xCoor[i] > -1 && yCoor[i] > -1)
         {
             QColor rndc = randColor();
             displayFigure(gs, source[i], xCoor[i], yCoor[i], MULT, b, QBrush(rndc));
@@ -177,14 +176,15 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
 
 void Packing::prepareSource()
 {
+    this->figuresRect();
     for (int i = 0; i < fCount; ++i)
     {
-        QRectF r = rectByFigure(source[i]);
-        if (r.height() >= r.width())
+        if (figuresBound[i].height() >= figuresBound[i].width())
         {
             rotateFigure(&source[i]);
         }
     }
     sortSource(&source, figureLessByHeight);
     sortSource(&source, figureLessByDensity);
+    this->figuresRect();
 }

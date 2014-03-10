@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QTime>
 
-FigurePacking::FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, DoubleGrid y, double w, double l)
+FigurePacking::FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, DoubleGrid y, double w, double l, Figure bound)
 {
     source = fs;
     grids = gs;
@@ -12,6 +12,7 @@ FigurePacking::FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, Doubl
     stripWidth = w;
     stripLength = l;
     count = fs.count();
+    figuresBound = bound;
 }
 
 //void FigurePacking::figureCortage(BoolGrid grid, DoubleList x, DoubleList y)
@@ -121,11 +122,6 @@ void FigurePacking::packCortage()
                 figx = -1.0;
                 for (++j; j < cortXCoords.count(); ++j)
                 {
-                    if (i == 3 && j == cortXCoords.count() - 1)
-                    {
-                        int trrt = 90;
-                        ++trrt;
-                    }
                     if (j)
                     {
                         this->shiftCortage(&newx, cortXCoords[j], cortXCoords[j - 1]);
@@ -134,8 +130,8 @@ void FigurePacking::packCortage()
                     {
                         newx = xcor;
                     }
-                    newxres = this->sum(xres, newx);
-                    if (this->checkSize(newxres, stripWidth, stripLength))
+                    newxres = this->sum(&xres, &newx);
+                    if (this->checkSize(&newxres, stripWidth, stripLength))
                     {
                         figx = cortXCoords[j];
                         break;
@@ -154,8 +150,8 @@ void FigurePacking::packCortage()
                 {
                     newy = ycor;
                 }
-                newyres = this->sum(yres, newy);
-                if (this->checkSize(newyres, stripLength, stripWidth))
+                newyres = this->sum(&yres, &newy);
+                if (this->checkSize(&newyres, stripLength, stripWidth))
                 {
                     figy = cortYCoords[k];
                     break;
@@ -231,12 +227,12 @@ void FigurePacking::shiftCortage(Cortage *c, double shift, double prevShift)
     }
 }
 
-Cortage FigurePacking::sum(Cortage c1, Cortage c2)
+Cortage FigurePacking::sum(Cortage *c1, Cortage *c2)
 {
     Cortage res;
 
-    int cnt1 = c1.count();
-    int cnt2 = c2.count();
+    int cnt1 = c1->count();
+    int cnt2 = c2->count();
     if (!cnt1 && !cnt2)
     {
         return res;
@@ -245,35 +241,38 @@ Cortage FigurePacking::sum(Cortage c1, Cortage c2)
     {
         if (cnt1 && !cnt2)
         {
-            return c1;
+            return *c1;
         }
         if (!cnt1 && cnt2)
         {
-            return c2;
+            return *c2;
         }
     }
 
-    Cortage insc1 = this->insertCortage(c1, c2);
-    Cortage insc2 = this->insertCortage(c2, c1);
-    for (int i = 0; i < insc1.count(); ++i)
+    Cortage* insc1 = this->insertCortage(c1, c2);
+    Cortage* insc2 = this->insertCortage(c2, c1);
+    for (int i = 0; i < insc1->count(); ++i)
     {
-        res.append(TupleCoordLength(insc1[i].first, insc1[i].second + insc2[i].second));
+        res.append(TupleCoordLength((*insc1)[i].first,(* insc1)[i].second + (*insc2)[i].second));
     }
+    delete insc1;
+    delete insc2;
 
     return res;
 }
 
-Cortage FigurePacking::insertCortage(Cortage src, Cortage ins)
+Cortage* FigurePacking::insertCortage(Cortage *src, Cortage *ins)
 {
-    Cortage res(src);
+    Cortage *res = new Cortage(*src);
 
     // сделать линейной
     int cmp;
-    for (int i = 0; i < ins.count(); ++i)
+    int j = 0;
+    for (int i = 0; i < ins->count(); ++i)
     {
-        for (int j = 0; j < res.count(); ++j)
+        for (; j < res->count(); ++j)
         {
-            cmp = tupleCompare(ins[i], res[j]);
+            cmp = tupleCompare((*ins)[i], (*res)[j]);
             if (!cmp)
             {
                 break;
@@ -282,14 +281,16 @@ Cortage FigurePacking::insertCortage(Cortage src, Cortage ins)
             {
                 if (cmp == -1)
                 {
-                    res.insert(j, TupleCoordLength(ins[i].first, res[j].second));//0.0));
+                    res->insert(j, TupleCoordLength((*ins)[i].first, (*res)[j].second));
+                    ++j;
                     break;
                 }
                 else
                 {
-                    if (j == res.count() - 1)
+                    if (j == res->count() - 1)
                     {
-                        res.insert(j + 1, TupleCoordLength(ins[i].first, 0.0));
+                        res->insert(j + 1, TupleCoordLength((*ins)[i].first, 0.0));
+                        ++j;
                         break;
                     }
                 }
@@ -301,18 +302,18 @@ Cortage FigurePacking::insertCortage(Cortage src, Cortage ins)
 }
 
 // необходимое условие
-bool FigurePacking::checkSize(Cortage x, double w, double l)
+bool FigurePacking::checkSize(Cortage *x, double w, double l)
 {
-    TupleCoordLength tx = x[x.count() - 1];
+    TupleCoordLength tx = (*x)[x->count() - 1];
 
     bool bl = (epsCompare(tx.first, l) < 1);
 
     double maxw = 0.0;
-    for (int i = 0; i < x.count(); ++i)
+    for (int i = 0; i < x->count(); ++i)
     {
-        if (epsCompare(x[i].second, maxw) == 1)
+        if (epsCompare((*x)[i].second, maxw) == 1)
         {
-            maxw = x[i].second;
+            maxw = (*x)[i].second;
         }
     }
     bool bw = (epsCompare(maxw, w) < 1);
@@ -337,32 +338,42 @@ bool FigurePacking::checkOverlap(double nx, double ny, int cnt)
 
     QRectF rj, rk;
 
+    double fx, fy;
+
     for (int i = 0; i < cnt; ++i)
     {
         f = source[i];
-        for (int j = 0; j < checkingFigure.count(); ++j)
+        fx = xPos[i];
+        fy = yPos[i];
+        if (!(nx + figuresBound[cnt].width() <= fx
+              || fx + figuresBound[i].width() <= nx
+              || ny + figuresBound[cnt].height() <= fy
+              || fy + figuresBound[i].height() <= ny))
         {
-            rj = checkingFigure[j];
-            xj = rj.x() + nx;
-            yj = rj.y() + ny;
-            wj = rj.width();
-            hj = rj.height();
-            for (int k = 0; k < f.count(); ++k)
+            for (int j = 0; j < checkingFigure.count(); ++j)
             {
-                rk = f[k];
-                xk = rk.x() + xPos[i];
-                yk = rk.y() + yPos[i];
-                wk = rk.width();
-                hk = rk.height();
-
-                bxj = (epsCompare(xj, xk + wk) > -1);
-                bxk = (epsCompare(xk, xj + wj) > -1);
-                byj = (epsCompare(yj, yk + hk) > -1);
-                byk = (epsCompare(yk, yj + hj) > -1);
-
-                if (!(bxj || bxk || byj || byk))
+                rj = checkingFigure[j];
+                xj = rj.x() + nx;
+                yj = rj.y() + ny;
+                wj = rj.width();
+                hj = rj.height();
+                for (int k = 0; k < f.count(); ++k)
                 {
-                    return false;
+                    rk = f[k];
+                    xk = rk.x() + fx;
+                    yk = rk.y() + fy;
+                    wk = rk.width();
+                    hk = rk.height();
+
+                    bxj = (epsCompare(xj, xk + wk) > -1);
+                    bxk = (epsCompare(xk, xj + wj) > -1);
+                    byj = (epsCompare(yj, yk + hk) > -1);
+                    byk = (epsCompare(yk, yj + hj) > -1);
+
+                    if (!(bxj || bxk || byj || byk))
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -418,6 +429,7 @@ void FigurePacking::pack()
 {
     QTime t;
     this->figuresToCortage();
+    qDebug() << "Start packing";
     t.start();
     this->packCortage();
     int ms = t.elapsed();

@@ -122,11 +122,6 @@ void deleteGrid(BoolGrid grid, int xcnt)
     delete grid;
 }
 
-//double rectSquare(QRectF r)
-//{
-//    return r.width() * r.height();
-//}
-
 QRectF expand(QRectF r, double m)
 {
     double x = r.x();

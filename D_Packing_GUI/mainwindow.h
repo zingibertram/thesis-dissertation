@@ -4,6 +4,7 @@
 #include "mainpack.h"
 
 #include <QMainWindow>
+#include <QTime>
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +24,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Packing model;
+    QTime t;
 };
 
 #endif // MAINWINDOW_H
