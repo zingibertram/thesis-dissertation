@@ -15,6 +15,8 @@ using namespace std;
 
 const double eps = 0.0001;
 
+const double POS_INF = 1.0E36;
+
 // Двойственные функции
 
 double dff_1_func(double x, int k)

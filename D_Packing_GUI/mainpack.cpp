@@ -1,6 +1,5 @@
 #include "utils.h"
 #include "lbounds.h"
-#include "packing.h"
 #include "mainpack.h"
 #include "figuregenerator.h"
 
@@ -20,7 +19,7 @@ Packing::Packing(char *filename)
 //    source = FigureGenerator::generateSource(16);
     this->prepareSource();
 //    this->saveSource();
-    stripWidth = 1.5;
+//    stripWidth = 1.5;
     stripLength = INT_MAX;
     this->figureFragmentation();
 }
@@ -66,13 +65,31 @@ void Packing::readFile(char *filename)
 
 void Packing::mainPacking()
 {
-    lowBounds();
     packing();
+    lowBounds();
 }
 
 void Packing::lowBounds()
 {
-    LowBounds lb(data);
+    double xsc = 1.0 / (square / stripWidth);
+    double ysc = 1.0 / stripWidth;
+    data << pack.xCortToFig();
+    data << pack.yCortToFig();
+    FigureVariantList dffData = data;
+    QRectF r;
+    for (int i = 0; i < dffData.count(); ++i)
+    {
+        for (int j = 0; j < dffData[i].count(); ++j)
+        {
+            for (int k = 0; k < dffData[i][j].count(); ++k)
+            {
+                r = dffData[i][j][k];
+                dffData[i][j][k] = QRectF(r.x() * xsc, r.y() * ysc, r.width() * xsc, r.height() * ysc);
+            }
+        }
+    }
+
+    LowBounds lb(dffData);
     dff1 = lb.dff_1();
     dff2 = lb.dff_2();
     dff3 = lb.dff_3();
@@ -81,7 +98,7 @@ void Packing::lowBounds()
 
 void Packing::packing()
 {
-    FigurePacking pack(source, grids, xGrid, yGrid, stripWidth, stripLength, figuresBound);
+    pack = FigurePacking(source, grids, xGrid, yGrid, stripWidth, stripLength, figuresBound);
     pack.pack();
     xCoor = pack.xPositions();
     yCoor = pack.yPositions();
@@ -96,7 +113,7 @@ void Packing::displaySource(QGraphicsScene *gs, int fragIdx)
     QPen b(Qt::black);
     QBrush g(QColor(0, 255, 127));
     QBrush r(QColor(255, 36, 0));
-    QPen rp(QColor(255, 36, 0));
+    double w = 0.0;
     for (int i = 0; i < fCount; ++i)
     {
         expanded = expand(figuresBound[i], MULT);
@@ -104,9 +121,12 @@ void Packing::displaySource(QGraphicsScene *gs, int fragIdx)
         gs->addRect(expanded, b, g);
         displayFigure(gs, data[fragIdx][i], 0.0, y, MULT, b, r);
         y += figuresBound[i].height() + shift;
+        if (figuresBound[i].width() > w)
+        {
+            w = figuresBound[i].width();
+        }
     }
-    gs->setSceneRect(0.0, 0.0, stripWidth * MULT, (y - shift) * MULT);
-//    gs->addRect(gs->sceneRect(), b, QBrush(QColor(0, 0, 0, 0)));
+    gs->setSceneRect(0.0, 0.0, w * MULT, (y - shift) * MULT);
 
     QImage img(gs->sceneRect().size().toSize(), QImage::Format_ARGB32);
     QPainter p(&img);
@@ -119,25 +139,31 @@ void Packing::displaySource(QGraphicsScene *gs, int fragIdx)
 void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
 {
     QString num;
-    tw->setRowCount(5);
-    tw->setColumnCount(data.count() + 1);
+    tw->setRowCount(6);
+    tw->setColumnCount(dff1.count() + 1);
     tw->setHorizontalHeaderItem(0, new QTableWidgetItem(QString::fromLocal8Bit("Функция")));
     tw->setHorizontalHeaderItem(1, new QTableWidgetItem(QString::fromLocal8Bit("Исходное разбиение")));
     tw->setHorizontalHeaderItem(2, new QTableWidgetItem(QString::fromLocal8Bit("Минимальное разбиение")));
     tw->setHorizontalHeaderItem(3, new QTableWidgetItem(QString::fromLocal8Bit("Максимальное разбиение")));
+    tw->setHorizontalHeaderItem(4, new QTableWidgetItem(QString::fromLocal8Bit("Х кортежи")));
+    tw->setHorizontalHeaderItem(5, new QTableWidgetItem(QString::fromLocal8Bit("Y кортежи")));
     tw->setItem(0, 0, new QTableWidgetItem(QString::fromLocal8Bit("u^(k)")));
     tw->setItem(1, 0, new QTableWidgetItem(QString::fromLocal8Bit("fi^eps")));
     tw->setItem(2, 0, new QTableWidgetItem(QString::fromLocal8Bit("U^eps")));
     tw->setItem(3, 0, new QTableWidgetItem(QString::fromLocal8Bit("Площадь")));
     tw->setItem(4, 0, new QTableWidgetItem(QString::fromLocal8Bit("Площадь полосы")));
-    tw->setItem(4, 1, new QTableWidgetItem(num.setNum(square)));
-    for (int i = 0; i < data.count(); ++i)
+    tw->setItem(4, 1, new QTableWidgetItem("1.0"));
+    tw->setItem(5, 0, new QTableWidgetItem(QString::fromLocal8Bit("Реальная площадь полосы")));
+    tw->setItem(5, 1, new QTableWidgetItem(num.setNum(square)));
+    for (int i = 0; i < dff1.count(); ++i)
     {
         tw->setItem(0, i + 1, new QTableWidgetItem(num.setNum(dff1[i])));
         tw->setItem(1, i + 1, new QTableWidgetItem(num.setNum(dff2[i])));
         tw->setItem(2, i + 1, new QTableWidgetItem(num.setNum(dff3[i])));
         tw->setItem(3, i + 1, new QTableWidgetItem(num.setNum(dff4[i])));
     }
+    tw->resizeColumnsToContents();
+    tw->resizeRowsToContents();
 
     double w, h;
     double width = 0.0;
@@ -164,8 +190,8 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
             }
         }
     }
-    gs->setSceneRect(0.0, 0.0, width, stripWidth * MULT);
-    gs->addRect(QRectF(0.0, 0.0, width - 1, stripWidth * MULT - 1), b, QBrush(QColor(0, 0, 0, 0)));
+    gs->setSceneRect(0.0, 0.0, width + 1, stripWidth * MULT + 1);
+    gs->addRect(QRectF(0.0, 0.0, width, stripWidth * MULT), b, QBrush(QColor(0, 0, 0, 0)));
 
     QImage img(gs->sceneRect().size().toSize(), QImage::Format_ARGB32);
     QPainter p(&img);
@@ -181,7 +207,7 @@ void Packing::prepareSource()
     {
         if (figuresBound[i].height() >= figuresBound[i].width())
         {
-            rotateFigure(&source[i]);
+//            rotateFigure(&source[i]);
         }
     }
     sortSource(&source, figureLessByHeight);

@@ -8,8 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    qDebug() << "Start calcilating";
-    t.start();
     ui->pushButton_Calculate->click();
 }
 
@@ -20,6 +18,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_Calculate_clicked()
 {
+    qDebug() << "Start calcilating";
+    t.start();
     model.mainPacking();
     int ms = t.elapsed();
     QGraphicsScene *gsSrc0 = new QGraphicsScene();

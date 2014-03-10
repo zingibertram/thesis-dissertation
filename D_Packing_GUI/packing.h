@@ -9,15 +9,17 @@ typedef QList<Cortage> CortageList;
 class FigurePacking
 {
 public:
+    FigurePacking();
     FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, DoubleGrid y, double w, double l, Figure bound);
     double squarePacking();
     DoubleList xPositions();
     DoubleList yPositions();
     void pack();
+    FigureList xCortToFig();
+    FigureList yCortToFig();
 
 private:
     void figuresToCortage();
-//    void figureCortage(BoolGrid grid, DoubleList x, DoubleList y);
     Cortage figureToCortage(BoolGrid grid, DoubleList coor, DoubleList width, bool xy);
     Cortage sum(Cortage *c1, Cortage *c2);
     Cortage* insertCortage(Cortage *src, Cortage *ins);

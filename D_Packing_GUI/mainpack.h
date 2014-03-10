@@ -2,6 +2,7 @@
 #define MAINPACK_H
 
 #include "utils.h"
+#include "packing.h"
 
 #include <QGraphicsScene>
 #include <QTableWidget>
@@ -44,6 +45,7 @@ private:
     DoubleList dff3;
     DoubleList dff4;
     double square;
+    FigurePacking pack;
 };
 
 #endif // MAINPACK_H

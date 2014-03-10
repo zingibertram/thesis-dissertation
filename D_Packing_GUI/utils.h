@@ -21,6 +21,7 @@ typedef QPair<double, double> TupleCoordLength; // (coord, width)
 typedef QPair<int, int> Position;
 
 extern const double eps;
+extern const double POS_INF;
 
 double dff_1_func(double x, int k);
 double dff_2_func(double x, double e);

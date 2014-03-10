@@ -17,7 +17,7 @@ DoubleList LowBounds::dff_1()
     for (int i = 0; i < data.count(); ++i)
     {
         byk = 0;
-        for (int k = 1; k < 100; ++k)
+        for (int k = 1; k < 100000; ++k)
         {
             s = 0;
             for (int l = 0; l < data[i].count(); ++l)

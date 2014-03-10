@@ -2,6 +2,12 @@
 
 #include <QDebug>
 #include <QTime>
+#include <math.h>
+
+FigurePacking::FigurePacking()
+{
+    ;
+}
 
 FigurePacking::FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, DoubleGrid y, double w, double l, Figure bound)
 {
@@ -14,41 +20,6 @@ FigurePacking::FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, Doubl
     count = fs.count();
     figuresBound = bound;
 }
-
-//void FigurePacking::figureCortage(BoolGrid grid, DoubleList x, DoubleList y)
-//{
-//    Cortage cortx;
-//    for (int i = 0; i < x.count() - 1; ++i)
-//    {
-//        double xi = x[i + 1];
-//        double h = 0.0;
-//        for (int j = 0; j < y.count() - 1; ++j)
-//        {
-//            if (grid[i][j])
-//            {
-//                h += y[j + 1] - y[j];
-//            }
-//        }
-//        cortx.append(TupleCoordLength(xi, h));
-//    }
-//    xCortage.append(cortx);
-
-//    Cortage corty;
-//    for (int i = 0; i < y.count() - 1; ++i)
-//    {
-//        double w = 0.0;
-//        double yi = y[i + 1];
-//        for (int j = 0; j < x.count() - 1; ++j)
-//        {
-//            if (grid[j][i])
-//            {
-//                w += x[j + 1] - x[j];
-//            }
-//        }
-//        corty.append(TupleCoordLength(yi, w));
-//    }
-//    yCortage.append(corty);
-//}
 
 Cortage FigurePacking::figureToCortage(BoolGrid grid, DoubleList coor, DoubleList width, bool xy)
 {
@@ -98,80 +69,79 @@ void FigurePacking::packCortage()
     xPos.append(0.0);
     yPos.append(0.0);
 
-    Cortage newx, newy,  xcor, ycor, newxres, newyres;
+    Cortage newx, newy,
+            xcor, ycor,
+            newxres, newyres,
+            localXRes, localYRes;
     DoubleList cortXCoords, cortYCoords;
     double figx, figy;
+    double localXCoords, localYCoords;
+    int j, k;
     for (int i = 1; i < count; ++i)
     {
         xcor = xCortage[i];
         ycor = yCortage[i];
+
+        localXCoords = POS_INF;
+
         cortXCoords = this->getCortageCoords(xres, xcor);
         cortYCoords = this->getCortageCoords(yres, ycor);
 
-        int j = -1;
-        int k = -1;
-        int num = 0;
-        do
+        figx = -1.0;
+        for (j = 0; j < cortXCoords.count(); ++j)
         {
-            if (k >= cortYCoords.count() - 1)
+            if (j)
             {
-                k = -1;
+                this->shiftCortage(&newx, cortXCoords[j], cortXCoords[j - 1]);
             }
-            if (j < cortXCoords.count() && k == -1)
+            else
             {
-                figx = -1.0;
-                for (++j; j < cortXCoords.count(); ++j)
+                newx = xcor;
+            }
+            newxres = this->sum(&xres, &newx);
+            if (this->checkSize(&newxres, stripWidth, stripLength))
+            {
+                figx = cortXCoords[j];
+
+                figy = -1.0;
+                for (k = 0; k <  cortYCoords.count(); ++k)
                 {
-                    if (j)
+                    if (k)
                     {
-                        this->shiftCortage(&newx, cortXCoords[j], cortXCoords[j - 1]);
+                        this->shiftCortage(&newy, cortYCoords[k], cortYCoords[k - 1]);
                     }
                     else
                     {
-                        newx = xcor;
+                        newy = ycor;
                     }
-                    newxres = this->sum(&xres, &newx);
-                    if (this->checkSize(&newxres, stripWidth, stripLength))
+                    newyres = this->sum(&yres, &newy);
+                    if (this->checkSize(&newyres, stripLength, stripWidth))
                     {
-                        figx = cortXCoords[j];
-                        break;
+                        figy = cortYCoords[k];
+
+                        if (this->checkOverlap(figx, figy, i) && (localXCoords >= POS_INF - eps || figx < localXCoords))
+                        {
+                            localXCoords = figx;
+                            localYCoords = figy;
+                            localXRes = newxres;
+                            localYRes = newyres;
+                        }
                     }
                 }
             }
-
-            figy = -1.0;
-            for (++k; k <  cortYCoords.count(); ++k)
-            {
-                if (k)
-                {
-                    this->shiftCortage(&newy, cortYCoords[k], cortYCoords[k - 1]);
-                }
-                else
-                {
-                    newy = ycor;
-                }
-                newyres = this->sum(&yres, &newy);
-                if (this->checkSize(&newyres, stripLength, stripWidth))
-                {
-                    figy = cortYCoords[k];
-                    break;
-                }
-            }
-
-            ++num;
-        } while (!this->checkOverlap(figx, figy, i)
-                 && (j < cortXCoords.count() || k < cortYCoords.count()));
-        if (this->checkOverlap(figx, figy, i))
-        {
-            xPos.append(figx);
-            yPos.append(figy);
-            xres = newxres;
-            yres = newyres;
         }
-        if (figx < 0.0 || figy < 0.0)
+
+        if (this->checkOverlap(localXCoords, localYCoords, i))
         {
-            xPos.append(-1.0);
-            yPos.append(-1.0);
+            xPos << localXCoords;
+            yPos << localYCoords;
+            xres = localXRes;
+            yres = localYRes;
+        }
+        if (localXCoords < 0.0 || localYCoords < 0.0)
+        {
+            xPos << -1.0;
+            yPos << -1.0;
         }
     }
 }
@@ -434,4 +404,42 @@ void FigurePacking::pack()
     this->packCortage();
     int ms = t.elapsed();
     qDebug() << "Working time" << ms;
+}
+
+FigureList FigurePacking::xCortToFig()
+{
+    double prev;
+    FigureList res;
+    Figure f;
+    for (int i = 0; i < xCortage.count(); ++i)
+    {
+        f.clear();
+        prev = 0.0;
+        for (int j = 0; j < xCortage[i].count(); ++j)
+        {
+            f << QRectF(prev, 0.0, xCortage[i][j].first - prev, xCortage[i][j].second);
+            prev = xCortage[i][j].first;
+        }
+        res << f;
+    }
+    return res;
+}
+
+FigureList FigurePacking::yCortToFig()
+{
+    double prev;
+    FigureList res;
+    Figure f;
+    for (int i = 0; i < yCortage.count(); ++i)
+    {
+        f.clear();
+        prev = 0.0;
+        for (int j = 0; j < yCortage[i].count(); ++j)
+        {
+            f << QRectF(prev, 0.0, yCortage[i][j].first - prev, yCortage[i][j].second);
+            prev = yCortage[i][j].first;
+        }
+        res << f;
+    }
+    return res;
 }
