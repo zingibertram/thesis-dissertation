@@ -11,7 +11,7 @@
 class Packing
 {
 public:
-    Packing(char *filename = "gen.in");
+    Packing(char *filename = "9.in");
     void readFile(char *filename);
     void mainPacking();
     void displaySource(QGraphicsScene *gs, int fragIdx);

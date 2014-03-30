@@ -9,7 +9,11 @@ FigurePacking::FigurePacking()
     ;
 }
 
-FigurePacking::FigurePacking(FigureList fs, BoolGridList gs, DoubleGrid x, DoubleGrid y, double w, double l, Figure bound)
+FigurePacking::FigurePacking(FigureList fs,
+                             BoolGridList gs,
+                             DoubleGrid x, DoubleGrid y,
+                             double w, double l,
+                             Figure bound)
 {
     source = fs;
     grids = gs;
@@ -60,6 +64,9 @@ void FigurePacking::figuresToCortage()
         xCortage.append(this->figureToCortage(grids[i], xGrid[i], yGrid[i], true));
         yCortage.append(this->figureToCortage(grids[i], yGrid[i], xGrid[i], false));
     }
+    grids = BoolGridList();
+    xGrid = DoubleGrid();
+    yGrid = DoubleGrid();
 }
 
 void FigurePacking::packCortage()
@@ -119,7 +126,8 @@ void FigurePacking::packCortage()
                     {
                         figy = cortYCoords[k];
 
-                        if (this->checkOverlap(figx, figy, i) && (localXCoords >= POS_INF - eps || figx < localXCoords))
+                        if (this->checkOverlap(figx, figy, i)
+                            && (localXCoords >= POS_INF - eps || figx < localXCoords))
                         {
                             localXCoords = figx;
                             localYCoords = figy;
@@ -180,6 +188,14 @@ DoubleList FigurePacking::getCortageCoords(Cortage src, Cortage ins)
         res.append(src[i].first);
     }
     qSort(res);
+    for (int i = 0; i < res.count() - 1; ++i)
+    {
+        if (!epsCompare(res[i], res[i + 1]))
+        {
+            res.removeAt(i + 1);
+            --i;
+        }
+    }
     return res;
 }
 

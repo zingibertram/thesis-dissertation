@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     lbounds.cpp \
     fragmentation.cpp \
     figuregenerator.cpp \
-    polygonview.cpp
+    polygonview.cpp \
+    packingbinarytree.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \

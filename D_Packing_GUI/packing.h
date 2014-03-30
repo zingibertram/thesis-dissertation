@@ -18,6 +18,17 @@ public:
     FigureList xCortToFig();
     FigureList yCortToFig();
 
+    // упаковка деревом
+public:
+    void packBinaryTree();
+private:
+    void packCortageBinaryTree();
+    void packTreeLeafPair(int l, int r);
+    void sumFigure(int l, int r, double x, double y, Cortage cx, Cortage cy);
+    bool checkOverlapPair(int l, int r, double nx, double ny);
+    QList<QList<int> > rectLeafs;
+    FigureList sourceBin;
+
 private:
     void figuresToCortage();
     Cortage figureToCortage(BoolGrid grid, DoubleList coor, DoubleList width, bool xy);
@@ -31,10 +42,12 @@ private:
     void shiftCortage(Cortage *c, double shift, double prevShift);
     bool intersect(int n, int f);
 
-    FigureList source;
+    // только для создания кортежей
     BoolGridList grids;
     DoubleGrid xGrid;
     DoubleGrid yGrid;
+
+    FigureList source;
     double stripWidth;
     double stripLength;
     int count;

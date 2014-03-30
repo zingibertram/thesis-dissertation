@@ -103,6 +103,7 @@ void Packing::packing()
 {
     pack = FigurePacking(source, grids, xGrid, yGrid, stripWidth, stripLength, figuresBound);
     pack.pack();
+//    pack.packBinaryTree();
     xCoor = pack.xPositions();
     yCoor = pack.yPositions();
     square = pack.squarePacking();
@@ -210,7 +211,7 @@ void Packing::prepareSource()
     {
         if (figuresBound[i].height() >= figuresBound[i].width())
         {
-//            rotateFigure(&source[i]);
+            rotateFigure(&source[i]);
         }
     }
     sortSource(&source, figureLessByHeight);
