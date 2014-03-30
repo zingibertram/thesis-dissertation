@@ -73,8 +73,7 @@ void Packing::lowBounds()
 {
     double xsc = 1.0 / (square / stripWidth);
     double ysc = 1.0 / stripWidth;
-    data << pack.xCortToFig();
-    data << pack.yCortToFig();
+    data << pack.xCortToFig() << pack.yCortToFig();
     FigureVariantList dffData = data;
     QRectF r;
     for (int i = 0; i < dffData.count(); ++i)
@@ -89,7 +88,11 @@ void Packing::lowBounds()
         }
     }
 
-    LowBounds lb(dffData);
+    QList<bool> isw, ish;
+    isw << true << true << true << false << true;
+    ish << true << true << true << false << true;
+
+    LowBounds lb(dffData, isw, ish);
     dff1 = lb.dff_1();
     dff2 = lb.dff_2();
     dff3 = lb.dff_3();

@@ -4,9 +4,11 @@
 
 using namespace std;
 
-LowBounds::LowBounds(FigureVariantList d)
+LowBounds::LowBounds(FigureVariantList d, QList<bool> iswarg, QList<bool> isharg)
 {
     data = d;
+    isw = iswarg;
+    ish = isharg;
 }
 
 DoubleList LowBounds::dff_1()
@@ -24,8 +26,8 @@ DoubleList LowBounds::dff_1()
             {
                 for (int j = 0; j < data[i][l].count(); ++j)
                 {
-                    w = dff_1_func(data[i][l][j].width(), k);
-                    h = dff_1_func(data[i][l][j].height(), k);
+                    w = isw[i] ? dff_1_func(data[i][l][j].width(), k) : data[i][l][j].width();
+                    h = ish[i] ? dff_1_func(data[i][l][j].height(), k) : data[i][l][j].height();
                     s += w * h;
                 }
             }
@@ -54,8 +56,8 @@ DoubleList LowBounds::dff_2()
             {
                 for (int j = 0; j < data[i][l].count(); ++j)
                 {
-                    w = dff_2_func(data[i][l][j].width(), k);
-                    h = dff_2_func(data[i][l][j].height(), k);
+                    w = isw[i] ? dff_2_func(data[i][l][j].width(), k) : data[i][l][j].width();
+                    h = ish[i] ? dff_2_func(data[i][l][j].height(), k) : data[i][l][j].height();
                     s += w * h;
                 }
             }
@@ -84,8 +86,8 @@ DoubleList LowBounds::dff_3()
             {
                 for (int j = 0; j < data[i][l].count(); ++j)
                 {
-                    w = dff_3_func(data[i][l][j].width(), k);
-                    h = dff_3_func(data[i][l][j].height(), k);
+                    w = isw[i] ? dff_3_func(data[i][l][j].width(), k) : data[i][l][j].width();
+                    h = ish[i] ? dff_3_func(data[i][l][j].height(), k) : data[i][l][j].height();
                     s += w * h;
                 }
             }

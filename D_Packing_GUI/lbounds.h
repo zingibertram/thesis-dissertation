@@ -3,10 +3,12 @@
 
 #include "utils.h"
 
+#include <QList>
+
 class LowBounds
 {
 public:
-    LowBounds(FigureVariantList d);
+    LowBounds(FigureVariantList d, QList<bool> iswarg, QList<bool> isharg);
     DoubleList dff_1();
     DoubleList dff_2();
     DoubleList dff_3();
@@ -14,6 +16,8 @@ public:
 
 private:
     FigureVariantList data;
+    QList<bool> isw;
+    QList<bool> ish;
 };
 
 #endif // LBOUNDS_H
