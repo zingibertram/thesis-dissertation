@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/gif">
+        <file>resources/proc.gif</file>
+    </qresource>
+    <qresource prefix="/input">
+        <file>resources/gen.in</file>
+    </qresource>
+</RCC>

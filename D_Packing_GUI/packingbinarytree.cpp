@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QTime>
 #include <math.h>
+#include <QApplication>
 
 void FigurePacking::packTreeLeafPair(int l, int r)
 {
@@ -39,6 +40,12 @@ void FigurePacking::packTreeLeafPair(int l, int r)
             figy = -1.0;
             for (k = 0; k <  cortYCoords.count(); ++k)
             {
+                QApplication::processEvents();
+                if (isCanceled)
+                {
+                    return;
+                }
+
                 if (k)
                 {
                     this->shiftCortage(&ycor, cortYCoords[k], cortYCoords[k - 1]);
@@ -155,6 +162,11 @@ void FigurePacking::packCortageBinaryTree()
         for (i = 0; i < source.count() - 1; ++i)
         {
             this->packTreeLeafPair(i, i + 1);
+
+            if (isCanceled)
+            {
+                return;
+            }
         }
         qDebug() << "Calculated level - " << k;
         ++k;

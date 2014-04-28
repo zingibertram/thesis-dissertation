@@ -11,12 +11,13 @@
 class Packing
 {
 public:
-    Packing(char *filename = "9.in");
-    void readFile(char *filename);
-    void mainPacking();
+    Packing();
+    void readFile(QString filename);
+    void mainPacking(PackType t);
     void displaySource(QGraphicsScene *gs, int fragIdx);
     void displayResult(QTableWidget *tw, QGraphicsScene *gs);
     void saveSource();
+    void newSource(QString filename);
 
 private:
     void figureFragmentation();
@@ -24,9 +25,10 @@ private:
     Figure quantumFragmentation(DoubleList x, DoubleList y, Figure f);
     Figure maxFigure(DoubleList x, DoubleList y, BoolGrid grid);
     void figuresRect();
-    void packing();
+    void packing(PackType t);
     void lowBounds();
     void prepareSource();
+    void clear();
 
     FigureList source;
     Figure figuresBound;

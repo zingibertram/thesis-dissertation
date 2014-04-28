@@ -9,24 +9,18 @@
 
 #include <QImage>
 #include <QPainter>
+#include <QFile>
+#include <QTextStream>
 
 using namespace std;
 
-Packing::Packing(char *filename)
+Packing::Packing()
 {
-    this->readFile(filename);
-    fCount = source.count();
-//    source = FigureGenerator::generateSource(16);
-    this->prepareSource();
-//    this->saveSource();
-//    stripWidth = 1.5;
-    stripLength = INT_MAX;
-    this->figureFragmentation();
 }
 
 void Packing::saveSource()
 {
-    freopen("gen.out", "w", stdout);
+    freopen("generated.out", "w", stdout);
     cout << source.count() << endl;
     for (int f = 0; f < source.count(); ++f)
     {
@@ -41,31 +35,33 @@ void Packing::saveSource()
     fclose(stdout);
 }
 
-void Packing::readFile(char *filename)
+void Packing::readFile(QString filename)
 {
-    source.clear();
-    freopen(filename, "r", stdin);
+    QFile file(filename);
+    file.open(QIODevice::ReadOnly);
+    QTextStream filestream(&file);
+//    freopen(fn, "r", stdin);
     int num;
-    cin >> num;
+    filestream >> num;
     double k, x, y, w, h;
     Figure f;
     for (int i = 0; i < num; ++i)
     {
         f.clear();
-        cin >> k;
+        filestream >> k;
         for (int j = 0; j < k; ++j)
         {
-            cin >> x >> y >> w >> h;
+            filestream >> x >> y >> w >> h;
             f.append(QRectF(x, y, w, h));
         }
         source.append(f);
     }
-    cin >> stripWidth;
+    filestream >> stripWidth;
 }
 
-void Packing::mainPacking()
+void Packing::mainPacking(PackType t)
 {
-    packing();
+    packing(t);
     lowBounds();
 }
 
@@ -99,11 +95,16 @@ void Packing::lowBounds()
     dff4 = lb.dff_4();
 }
 
-void Packing::packing()
+void Packing::packing(PackType t)
 {
     pack = FigurePacking(source, grids, xGrid, yGrid, stripWidth, stripLength, figuresBound);
-    pack.pack();
-//    pack.packBinaryTree();
+
+    switch (t)
+    {
+    case BINARY : pack.packBinaryTree(); break;
+    case SEQUENCE : pack.pack(); break;
+    }
+
     xCoor = pack.xPositions();
     yCoor = pack.yPositions();
     square = pack.squarePacking();
@@ -217,4 +218,35 @@ void Packing::prepareSource()
     sortSource(&source, figureLessByHeight);
     sortSource(&source, figureLessByDensity);
     this->figuresRect();
+}
+
+void Packing::clear()
+{
+    for (int i = 0; i < grids.count(); ++i)
+    {
+        deleteGrid(grids[i], xGrid[i].count() - 1);
+    }
+
+    source.clear();
+    figuresBound.clear();
+    data.clear();
+    grids.clear();
+    xGrid.clear();
+    yGrid.clear();
+    xCoor.clear();
+    yCoor.clear();
+    dff1.clear();
+    dff2.clear();
+    dff3.clear();
+    dff4.clear();
+}
+
+void Packing::newSource(QString filename)
+{
+    this->clear();
+    this->readFile(filename);
+    fCount = source.count();
+    this->prepareSource();
+    stripLength = INT_MAX;
+    this->figureFragmentation();
 }

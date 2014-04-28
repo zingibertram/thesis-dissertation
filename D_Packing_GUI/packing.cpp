@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QTime>
 #include <math.h>
+#include <QApplication>
 
 FigurePacking::FigurePacking()
 {
@@ -113,6 +114,12 @@ void FigurePacking::packCortage()
                 figy = -1.0;
                 for (k = 0; k <  cortYCoords.count(); ++k)
                 {
+                    QApplication::processEvents();
+                    if (isCanceled)
+                    {
+                        return;
+                    }
+
                     if (k)
                     {
                         this->shiftCortage(&newy, cortYCoords[k], cortYCoords[k - 1]);

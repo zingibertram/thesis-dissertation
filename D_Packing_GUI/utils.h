@@ -7,6 +7,11 @@
 #include <QGraphicsScene>
 #include <QColor>
 
+enum PackType
+{
+    BINARY, SEQUENCE
+};
+
 typedef QList<QRectF> Figure;
 typedef QList<Figure> FigureList;
 typedef QList<FigureList> FigureVariantList;
@@ -22,6 +27,7 @@ typedef QPair<int, int> Position;
 
 extern const double eps;
 extern const double POS_INF;
+extern bool isCanceled;
 
 double dff_1_func(double x, int k);
 double dff_2_func(double x, double e);

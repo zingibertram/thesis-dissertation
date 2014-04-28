@@ -19,7 +19,9 @@ SOURCES += main.cpp\
     fragmentation.cpp \
     figuregenerator.cpp \
     polygonview.cpp \
-    packingbinarytree.cpp
+    packingbinarytree.cpp \
+    doingframe.cpp \
+    utilsdff.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -27,11 +29,16 @@ HEADERS  += mainwindow.h \
     mainpack.h \
     lbounds.h \
     figuregenerator.h \
-    polygonview.h
+    polygonview.h \
+    doingframe.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    doingframe.ui
 
 OTHER_FILES += \
     result.txt \
     data.in \
     gen.in
+
+RESOURCES += \
+    images.qrc

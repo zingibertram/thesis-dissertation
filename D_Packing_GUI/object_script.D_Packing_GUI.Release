@@ -8,6 +8,11 @@ INPUT(
 ./release\fragmentation.o
 ./release\figuregenerator.o
 ./release\polygonview.o
+./release\packingbinarytree.o
+./release\doingframe.o
+./release\utilsdff.o
 ./release\moc_mainwindow.o
 ./release\moc_polygonview.o
+./release\moc_doingframe.o
+./release\qrc_images.o
 );
