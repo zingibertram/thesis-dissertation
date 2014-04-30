@@ -3,6 +3,7 @@
 /Line_Pack/Makefile*
 /Line_Pack/ui*
 /Line_Pack/dip.pro.user
+/D_Packing_GUI/data/*
 /D_Packing_GUI/release/*
 /D_Packing_GUI/debug/*
 /D_Packing_GUI/Makefile*

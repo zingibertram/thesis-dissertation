@@ -1,62 +1,19 @@
 #include "utils.h"
+#include "translation.h"
 #include "lbounds.h"
 #include "mainpack.h"
 #include "figuregenerator.h"
 
-#include <iostream>
-#include <stdio.h>
 #include <time.h>
 
 #include <QImage>
 #include <QPainter>
-#include <QFile>
-#include <QTextStream>
+#include <QTableWidgetItem>
 
 using namespace std;
 
 Packing::Packing()
 {
-}
-
-void Packing::saveSource()
-{
-    freopen("generated.out", "w", stdout);
-    cout << source.count() << endl;
-    for (int f = 0; f < source.count(); ++f)
-    {
-        Figure ortho = source[f];
-        cout << ortho.count() << endl;
-        for (int r = 0; r < ortho.count(); ++r)
-        {
-            QRectF rect = ortho[r];
-            cout << rect.x() << " " << rect.y()  << " " << rect.width()  << " " << rect.height() << endl;
-        }
-    }
-    fclose(stdout);
-}
-
-void Packing::readFile(QString filename)
-{
-    QFile file(filename);
-    file.open(QIODevice::ReadOnly);
-    QTextStream filestream(&file);
-//    freopen(fn, "r", stdin);
-    int num;
-    filestream >> num;
-    double k, x, y, w, h;
-    Figure f;
-    for (int i = 0; i < num; ++i)
-    {
-        f.clear();
-        filestream >> k;
-        for (int j = 0; j < k; ++j)
-        {
-            filestream >> x >> y >> w >> h;
-            f.append(QRectF(x, y, w, h));
-        }
-        source.append(f);
-    }
-    filestream >> stripWidth;
 }
 
 void Packing::mainPacking(PackType t)
@@ -132,43 +89,58 @@ void Packing::displaySource(QGraphicsScene *gs, int fragIdx)
         }
     }
     gs->setSceneRect(0.0, 0.0, w * MULT, (y - shift) * MULT);
-
-    QImage img(gs->sceneRect().size().toSize(), QImage::Format_ARGB32);
-    QPainter p(&img);
-    gs->render(&p);
-    p.end();
-    QString num;
-    img.save(QString("source%1.png").arg(num.setNum(fragIdx)));
 }
 
-void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
+void Packing::displayRatioResult(QTableWidget *ratio)
 {
     QString num;
-    tw->setRowCount(6);
-    tw->setColumnCount(dff1.count() + 1);
-    tw->setHorizontalHeaderItem(0, new QTableWidgetItem(QString::fromLocal8Bit("Функция")));
-    tw->setHorizontalHeaderItem(1, new QTableWidgetItem(QString::fromLocal8Bit("Исходное разбиение")));
-    tw->setHorizontalHeaderItem(2, new QTableWidgetItem(QString::fromLocal8Bit("Минимальное разбиение")));
-    tw->setHorizontalHeaderItem(3, new QTableWidgetItem(QString::fromLocal8Bit("Максимальное разбиение")));
-    tw->setHorizontalHeaderItem(4, new QTableWidgetItem(QString::fromLocal8Bit("Х кортежи")));
-    tw->setHorizontalHeaderItem(5, new QTableWidgetItem(QString::fromLocal8Bit("Y кортежи")));
-    tw->setItem(0, 0, new QTableWidgetItem(QString::fromLocal8Bit("u^(k)")));
-    tw->setItem(1, 0, new QTableWidgetItem(QString::fromLocal8Bit("fi^eps")));
-    tw->setItem(2, 0, new QTableWidgetItem(QString::fromLocal8Bit("U^eps")));
-    tw->setItem(3, 0, new QTableWidgetItem(QString::fromLocal8Bit("Площадь")));
-    tw->setItem(4, 0, new QTableWidgetItem(QString::fromLocal8Bit("Площадь полосы")));
-    tw->setItem(4, 1, new QTableWidgetItem("1.0"));
-    tw->setItem(5, 0, new QTableWidgetItem(QString::fromLocal8Bit("Реальная площадь полосы")));
-    tw->setItem(5, 1, new QTableWidgetItem(num.setNum(square)));
+    ratio->setRowCount(6);
+    ratio->setColumnCount(dff1.count() + 1);
+    ratio->setHorizontalHeaderItem(0, new QTableWidgetItem(TrRu::function));
+    ratio->setHorizontalHeaderItem(1, new QTableWidgetItem(TrRu::sourceFrag));
+    ratio->setHorizontalHeaderItem(2, new QTableWidgetItem(TrRu::minFrag));
+    ratio->setHorizontalHeaderItem(3, new QTableWidgetItem(TrRu::maxFrag));
+    ratio->setHorizontalHeaderItem(4, new QTableWidgetItem(TrRu::xCort));
+    ratio->setHorizontalHeaderItem(5, new QTableWidgetItem(TrRu::yCort));
+    ratio->setItem(0, 0, new QTableWidgetItem(TrRu::dff1));
+    ratio->setItem(1, 0, new QTableWidgetItem(TrRu::dff2));
+    ratio->setItem(2, 0, new QTableWidgetItem(TrRu::dff3));
+    ratio->setItem(3, 0, new QTableWidgetItem(TrRu::dff4));
+    ratio->setItem(4, 0, new QTableWidgetItem(TrRu::stripSquare));
+    ratio->setItem(4, 1, new QTableWidgetItem(TrRu::stripSquareNum));
+    ratio->setItem(5, 0, new QTableWidgetItem(TrRu::stripSquareReal));
+    ratio->setItem(5, 1, new QTableWidgetItem(num.setNum(square)));
     for (int i = 0; i < dff1.count(); ++i)
     {
-        tw->setItem(0, i + 1, new QTableWidgetItem(num.setNum(dff1[i])));
-        tw->setItem(1, i + 1, new QTableWidgetItem(num.setNum(dff2[i])));
-        tw->setItem(2, i + 1, new QTableWidgetItem(num.setNum(dff3[i])));
-        tw->setItem(3, i + 1, new QTableWidgetItem(num.setNum(dff4[i])));
+        ratio->setItem(0, i + 1, new QTableWidgetItem(num.setNum(dff1[i])));
+        ratio->setItem(1, i + 1, new QTableWidgetItem(num.setNum(dff2[i])));
+        ratio->setItem(2, i + 1, new QTableWidgetItem(num.setNum(dff3[i])));
+        ratio->setItem(3, i + 1, new QTableWidgetItem(num.setNum(dff4[i])));
     }
-    tw->resizeColumnsToContents();
-    tw->resizeRowsToContents();
+    ratio->resizeColumnsToContents();
+    ratio->resizeRowsToContents();
+}
+
+void Packing::displayCoordsResult(QTableWidget *coords)
+{
+    coords->setRowCount(fCount);
+    coords->setColumnCount(2);
+
+    coords->setHorizontalHeaderItem(0, new QTableWidgetItem(TrRu::x));
+    coords->setHorizontalHeaderItem(1, new QTableWidgetItem(TrRu::y));
+
+    QString num;
+    for (int i = 0; i < fCount; ++i)
+    {
+        coords->setItem(i, 0, new QTableWidgetItem(num.setNum(xCoor[i])));
+        coords->setItem(i, 1, new QTableWidgetItem(num.setNum(yCoor[i])));
+    }
+}
+
+void Packing::displayResult(QTableWidget * ratio, QTableWidget *coord, QGraphicsScene *gs)
+{
+    this->displayRatioResult(ratio);
+    this->displayCoordsResult(coord);
 
     double w, h;
     double width = 0.0;
@@ -197,16 +169,14 @@ void Packing::displayResult(QTableWidget *tw, QGraphicsScene *gs)
     }
     gs->setSceneRect(0.0, 0.0, width + 1, stripWidth * MULT + 1);
     gs->addRect(QRectF(0.0, 0.0, width, stripWidth * MULT), b, QBrush(QColor(0, 0, 0, 0)));
-
-    QImage img(gs->sceneRect().size().toSize(), QImage::Format_ARGB32);
-    QPainter p(&img);
-    gs->render(&p);
-    p.end();
-    img.save("result.png");
 }
 
 void Packing::prepareSource()
 {
+    sortSource(&source, figureLessByHeight);
+    sortSource(&source, figureLessByDensity);
+    this->sourceIdxAccord();
+
     this->figuresRect();
     for (int i = 0; i < fCount; ++i)
     {
@@ -215,8 +185,6 @@ void Packing::prepareSource()
             rotateFigure(&source[i]);
         }
     }
-    sortSource(&source, figureLessByHeight);
-    sortSource(&source, figureLessByDensity);
     this->figuresRect();
 }
 
@@ -239,14 +207,42 @@ void Packing::clear()
     dff2.clear();
     dff3.clear();
     dff4.clear();
+    input.clear();
+    sourceReshuffle.clear();
+
+    fCount = 0;
+    stripWidth = 0;
+    square = 0;
+    stripLength = INT_MAX;
 }
 
 void Packing::newSource(QString filename)
 {
     this->clear();
     this->readFile(filename);
-    fCount = source.count();
     this->prepareSource();
-    stripLength = INT_MAX;
     this->figureFragmentation();
+}
+
+void Packing::generateSource(QString filename, int cnt)
+{
+    FigureList gen = FigureGenerator::generateSource(cnt);
+
+    this->saveGeneratedSource(filename, gen);
+}
+
+void Packing::sourceIdxAccord()
+{
+    for (int i = 0; i < fCount; ++i)
+    {
+        sourceReshuffle << i;
+        for (int j = 0; j < fCount; ++j)
+        {
+            if (input[i] == source[j])
+            {
+                sourceReshuffle[i] = j;
+                break;
+            }
+        }
+    }
 }

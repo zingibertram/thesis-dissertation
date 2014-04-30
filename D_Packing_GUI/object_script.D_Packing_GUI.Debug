@@ -11,6 +11,8 @@ INPUT(
 ./debug\packingbinarytree.o
 ./debug\doingframe.o
 ./debug\utilsdff.o
+./debug\mainpackio.o
+./debug\translation.o
 ./debug\moc_mainwindow.o
 ./debug\moc_polygonview.o
 ./debug\moc_doingframe.o

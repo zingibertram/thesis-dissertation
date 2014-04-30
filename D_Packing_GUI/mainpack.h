@@ -6,7 +6,6 @@
 
 #include <QGraphicsScene>
 #include <QTableWidget>
-#include <QTableWidgetItem>
 
 class Packing
 {
@@ -15,9 +14,10 @@ public:
     void readFile(QString filename);
     void mainPacking(PackType t);
     void displaySource(QGraphicsScene *gs, int fragIdx);
-    void displayResult(QTableWidget *tw, QGraphicsScene *gs);
-    void saveSource();
+    void displayResult(QTableWidget *ratio, QTableWidget *coord, QGraphicsScene *gs);
+    void saveResult(QString filename);
     void newSource(QString filename);
+    void generateSource(QString filename, int cnt = 30);
 
 private:
     void figureFragmentation();
@@ -29,8 +29,13 @@ private:
     void lowBounds();
     void prepareSource();
     void clear();
+    void displayRatioResult(QTableWidget *ratio);
+    void displayCoordsResult(QTableWidget *coords);
+    void sourceIdxAccord();
+    void saveGeneratedSource(QString filename, FigureList gen);
 
     FigureList source;
+    FigureList input;
     Figure figuresBound;
     FigureVariantList data;
     BoolGridList grids;
@@ -48,6 +53,7 @@ private:
     DoubleList dff4;
     double square;
     FigurePacking pack;
+    IntList sourceReshuffle;
 };
 
 #endif // MAINPACK_H

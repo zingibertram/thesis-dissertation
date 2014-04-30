@@ -97,6 +97,13 @@
           </property>
           <widget class="PolygonView" name="graphicsView_Result"/>
           <widget class="QTableWidget" name="tableWidget_Result"/>
+          <widget class="QTableWidget" name="tableWidget_Coords">
+           <property name="columnCount">
+            <number>2</number>
+           </property>
+           <column/>
+           <column/>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -157,6 +164,7 @@
      <string>Файл</string>
     </property>
     <addaction name="action_Open"/>
+    <addaction name="action_Save"/>
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
    </widget>
@@ -164,8 +172,16 @@
     <property name="title">
      <string>Действия</string>
     </property>
+    <widget class="QMenu" name="menu_Generate">
+     <property name="title">
+      <string>Генерировать данные</string>
+     </property>
+     <addaction name="action_Gen"/>
+    </widget>
     <addaction name="action_DoSequentaly"/>
     <addaction name="action_DoBinary"/>
+    <addaction name="separator"/>
+    <addaction name="menu_Generate"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Actions"/>
@@ -194,12 +210,32 @@
   </action>
   <action name="action_DoSequentaly">
    <property name="text">
-    <string>Вычислить</string>
+    <string>Упаковать последовательно</string>
    </property>
   </action>
   <action name="action_DoBinary">
    <property name="text">
     <string>Упаковать попарно</string>
+   </property>
+  </action>
+  <action name="action_Save">
+   <property name="text">
+    <string>Сохранить результаты</string>
+   </property>
+  </action>
+  <action name="action_Generate">
+   <property name="text">
+    <string>Сгенерировать данные</string>
+   </property>
+  </action>
+  <action name="action21">
+   <property name="text">
+    <string>21</string>
+   </property>
+  </action>
+  <action name="action_Gen">
+   <property name="text">
+    <string>Генерировать</string>
    </property>
   </action>
  </widget>

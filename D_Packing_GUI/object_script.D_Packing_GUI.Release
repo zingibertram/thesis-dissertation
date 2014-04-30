@@ -11,6 +11,8 @@ INPUT(
 ./release\packingbinarytree.o
 ./release\doingframe.o
 ./release\utilsdff.o
+./release\mainpackio.o
+./release\translation.o
 ./release\moc_mainwindow.o
 ./release\moc_polygonview.o
 ./release\moc_doingframe.o

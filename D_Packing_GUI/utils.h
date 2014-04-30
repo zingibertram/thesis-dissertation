@@ -12,6 +12,8 @@ enum PackType
     BINARY, SEQUENCE
 };
 
+typedef QList<int> IntList;
+
 typedef QList<QRectF> Figure;
 typedef QList<Figure> FigureList;
 typedef QList<FigureList> FigureVariantList;

@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     polygonview.cpp \
     packingbinarytree.cpp \
     doingframe.cpp \
-    utilsdff.cpp
+    utilsdff.cpp \
+    mainpackio.cpp \
+    translation.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -30,13 +32,13 @@ HEADERS  += mainwindow.h \
     lbounds.h \
     figuregenerator.h \
     polygonview.h \
-    doingframe.h
+    doingframe.h \
+    translation.h
 
 FORMS    += mainwindow.ui \
     doingframe.ui
 
 OTHER_FILES += \
-    result.txt \
     data.in \
     gen.in
 

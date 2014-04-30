@@ -3,6 +3,7 @@
         <file>resources/proc.gif</file>
     </qresource>
     <qresource prefix="/input">
-        <file>resources/gen.in</file>
+        <file>resources/gen.dat</file>
     </qresource>
+    <qresource prefix="/new/prefix1"/>
 </RCC>

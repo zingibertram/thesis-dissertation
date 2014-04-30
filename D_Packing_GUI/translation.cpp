@@ -1,0 +1,31 @@
+#include "translation.h"
+
+#include <QApplication>
+
+const QString TrRu::function = QString::fromUtf8("Функция");
+const QString TrRu::sourceFrag = QString::fromUtf8("Исходное разбиение");
+const QString TrRu::minFrag = QString::fromUtf8("Минимальное разбиение");
+const QString TrRu::maxFrag = QString::fromUtf8("Максимальное разбиение");
+const QString TrRu::xCort = QString::fromUtf8("Х кортежи");
+const QString TrRu::yCort = QString::fromUtf8("Y кортежи");
+const QString TrRu::dff1 = QString::fromUtf8("u^(k)");
+const QString TrRu::dff2 = QString::fromUtf8("fi^eps");
+const QString TrRu::dff3 = QString::fromUtf8("U^eps");
+const QString TrRu::dff4 = QString::fromUtf8("Площадь");
+const QString TrRu::stripSquare = QString::fromUtf8("Площадь полосы");
+const QString TrRu::stripSquareNum = QString::fromUtf8("1.0");
+const QString TrRu::stripSquareReal = QString::fromUtf8("Реальная площадь полосы");
+const QString TrRu::x = QString::fromUtf8("X");
+const QString TrRu::y = QString::fromUtf8("Y");
+const QString TrRu::dataFiles = QString::fromUtf8("Файлы данных (*.dat)");
+const QString TrRu::openDlgHead = QString::fromUtf8("Открыть файл с данными");
+const QString TrRu::saveResDir = QString::fromUtf8("Директория сохранения результатов");
+const QString TrRu::saveGenDir = QString::fromUtf8("Файл сохранения сгенерированных данных");
+const QString TrRu::calcCancel = QString::fromUtf8("Вычисление прервано");
+const QString TrRu::cancel = QString::fromUtf8("Прерывание");
+const QString TrRu::defaultSource = QString::fromUtf8(":/input/resources/gen.dat");
+const QString TrRu::resultDatFile = QString::fromUtf8("result.dat");
+const QString TrRu::resultImgFile = QString::fromUtf8("result.png");
+const QString TrRu::sourceImgFile = QString::fromUtf8("source.png");
+const QString TrRu::sourceMaxImgFile = QString::fromUtf8("source_max.png");
+const QString TrRu::sourceMinImgFile = QString::fromUtf8("source_min.png");
