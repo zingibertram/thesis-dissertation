@@ -4,7 +4,7 @@
 #include "utils.h"
 
 DoingFrame::DoingFrame(QWidget *parent) :
-    QWidget(parent, Qt::Popup),
+    QDialog(parent, Qt::SplashScreen),
     ui(new Ui::DoingFrame)
 {
     ui->setupUi(this);

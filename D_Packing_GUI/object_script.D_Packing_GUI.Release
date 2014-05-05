@@ -13,7 +13,9 @@ INPUT(
 ./release\utilsdff.o
 ./release\mainpackio.o
 ./release\translation.o
+./release\knapsacksolver.o
 ./release\moc_mainwindow.o
+./release\moc_mainpack.o
 ./release\moc_polygonview.o
 ./release\moc_doingframe.o
 ./release\qrc_images.o

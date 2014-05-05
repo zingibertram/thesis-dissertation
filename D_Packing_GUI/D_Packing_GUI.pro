@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     doingframe.cpp \
     utilsdff.cpp \
     mainpackio.cpp \
-    translation.cpp
+    translation.cpp \
+    knapsacksolver.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -33,7 +34,8 @@ HEADERS  += mainwindow.h \
     figuregenerator.h \
     polygonview.h \
     doingframe.h \
-    translation.h
+    translation.h \
+    knapsacksolver.h
 
 FORMS    += mainwindow.ui \
     doingframe.ui
@@ -44,3 +46,5 @@ OTHER_FILES += \
 
 RESOURCES += \
     images.qrc
+
+RC_FILE = exeicon.rc

@@ -5,7 +5,8 @@
 #include <QWidget>
 #include <QWheelEvent>
 
-class PolygonView : public QGraphicsView
+class PolygonView : public QGraphicsView // элемент интерфейса, отображает графическую сцену
+                                         // здесь переопределён метод wheelEvent, чтобы менять размер изображения
 {
     Q_OBJECT
 public:

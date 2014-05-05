@@ -1,5 +1,4 @@
 #include "utils.h"
-#include "translation.h"
 #include "lbounds.h"
 #include "mainpack.h"
 #include "figuregenerator.h"
@@ -9,21 +8,32 @@
 #include <QImage>
 #include <QPainter>
 #include <QTableWidgetItem>
+#include <QTime>
+#include <QDebug>
 
 using namespace std;
 
-Packing::Packing()
+Packing::Packing() :
+    QObject(NULL)
 {
+    fCount = 0;
+    stripWidth = 0;
+    square = 0;
+    stripLength = INT_MAX;
 }
 
 void Packing::mainPacking(PackType t)
 {
     packing(t);
+    emit this->packingEnd();
     lowBounds();
 }
 
 void Packing::lowBounds()
 {
+    QTime t;
+    t.start();
+
     double xsc = 1.0 / (square / stripWidth);
     double ysc = 1.0 / stripWidth;
     data << pack.xCortToFig() << pack.yCortToFig();
@@ -45,11 +55,15 @@ void Packing::lowBounds()
     isw << true << true << true << false << true;
     ish << true << true << true << false << true;
 
+    qDebug() << "Prepare to calc low bounds " << t.elapsed();
+    t.start();
+
     LowBounds lb(dffData, isw, ish);
     dff1 = lb.dff_1();
     dff2 = lb.dff_2();
     dff3 = lb.dff_3();
     dff4 = lb.dff_4();
+    qDebug() << "Alg end " << t.elapsed();
 }
 
 void Packing::packing(PackType t)
@@ -245,4 +259,9 @@ void Packing::sourceIdxAccord()
             }
         }
     }
+}
+
+int Packing::sourceCount()
+{
+    return fCount;
 }

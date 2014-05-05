@@ -3,7 +3,8 @@
 
 #include <QString>
 
-class TrRu
+class TrRu // строковые константы
+           // для удобства в отдельном классе
 {
 public:
     static const QString function;
@@ -33,6 +34,10 @@ public:
     static const QString sourceImgFile;
     static const QString sourceMaxImgFile;
     static const QString sourceMinImgFile;
+    static const QString damagedFile;
+    static const QString error;
+    static const QString damagedInput;
+    static const QString damagedCalc;
 };
 
 #endif // TRANSLATION_H

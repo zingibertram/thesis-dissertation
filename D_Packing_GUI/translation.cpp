@@ -29,3 +29,7 @@ const QString TrRu::resultImgFile = QString::fromUtf8("result.png");
 const QString TrRu::sourceImgFile = QString::fromUtf8("source.png");
 const QString TrRu::sourceMaxImgFile = QString::fromUtf8("source_max.png");
 const QString TrRu::sourceMinImgFile = QString::fromUtf8("source_min.png");
+const QString TrRu::damagedFile = QString::fromUtf8("Невозможно открыть файл для чтения/записи");
+const QString TrRu::error = QString::fromUtf8("Ошибка");
+const QString TrRu::damagedInput = QString::fromUtf8("Входные данные неверны");
+const QString TrRu::damagedCalc = QString::fromUtf8("Невозможно произвести вычисления. Нет корректных входных данных");

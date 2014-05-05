@@ -13,7 +13,9 @@ INPUT(
 ./debug\utilsdff.o
 ./debug\mainpackio.o
 ./debug\translation.o
+./debug\knapsacksolver.o
 ./debug\moc_mainwindow.o
+./debug\moc_mainpack.o
 ./debug\moc_polygonview.o
 ./debug\moc_doingframe.o
 ./debug\qrc_images.o

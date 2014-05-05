@@ -7,14 +7,18 @@
 #include <QImage>
 #include <QDir>
 #include <QWidgetAction>
-#include <QHBoxLayout>
+#include <QAbstractItemView>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    processFrame = new DoingFrame();
+
+    ui->tableWidget_Coords->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->tableWidget_Result->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    processFrame = new DoingFrame(this);
     label_sourceFile = new QLabel();
     model.newSource(TrRu::defaultSource);
     this->addGenerateAction();
@@ -27,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->connect(ui->action_Gen, SIGNAL(triggered()), this, SLOT(action_Generate_triggered()));
     this->connect(ui->pushButton_CalcBin, SIGNAL(clicked()), this, SLOT(action_DoBinary_triggered()));
     this->connect(ui->pushButton_CalcSeq, SIGNAL(clicked()), this, SLOT(action_DoSequentaly_triggered()));
+    this->connect(&model, SIGNAL(packingEnd()), processFrame, SLOT(hide()));
 }
 
 MainWindow::~MainWindow()
@@ -81,15 +86,19 @@ void MainWindow::action_DoSequentaly_triggered()
 
 void MainWindow::calculate(PackType t)
 {
+    if (model.sourceCount() == 0)
+    {
+        QMessageBox::warning(this, TrRu::error, TrRu::damagedCalc);
+        return;
+    }
+
     isCanceled = false;
 
-    this->setEnabled(false);
-    processFrame->show();
+    this->setControlsEnabled(false);
 
     model.mainPacking(t);
 
-    processFrame->hide();
-    this->setEnabled(true);
+    this->setControlsEnabled(true);
 
     if (isCanceled)
     {
@@ -118,8 +127,7 @@ void MainWindow::action_Generate_triggered()
 {
     QString filename = QFileDialog::getSaveFileName(this, TrRu::saveGenDir, QString(), TrRu::dataFiles);
 
-    this->setEnabled(false);
-    processFrame->show();
+    this->setControlsEnabled(false);
 
     int num = 5;
     if (genCnt != NULL)
@@ -128,8 +136,7 @@ void MainWindow::action_Generate_triggered()
     }
     model.generateSource(filename, num);
 
-    processFrame->hide();
-    this->setEnabled(true);
+    this->setControlsEnabled(true);
 }
 
 void MainWindow::addGenerateAction()
@@ -143,4 +150,19 @@ void MainWindow::addGenerateAction()
     wa->setDefaultWidget(genCnt);
 
     ui->menu_Generate->addAction(wa);
+}
+
+void MainWindow::setControlsEnabled(bool enable)
+{
+    if (enable)
+    {
+        processFrame->hide();
+    }
+    ui->pushButton_CalcBin->setEnabled(enable);
+    ui->pushButton_CalcSeq->setEnabled(enable);
+    ui->menubar->setEnabled(enable);
+    if (!enable)
+    {
+        processFrame->show();
+    }
 }

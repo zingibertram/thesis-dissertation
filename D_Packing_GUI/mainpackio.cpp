@@ -22,15 +22,33 @@ void Packing::readFile(QString filename)
             for (int j = 0; j < k; ++j)
             {
                 filestream >> x >> y >> w >> h;
+                if (x < 0 || y < 0 || w <= 0 || h <= 0)
+                {
+                    QMessageBox::warning(NULL, TrRu::error, TrRu::damagedInput);
+                    this->clear();
+                    file.close();
+                    return;
+                }
                 f.append(QRectF(x, y, w, h));
             }
             source.append(f);
         }
         filestream >> stripWidth;
+        if (stripWidth <= 0)
+        {
+            QMessageBox::warning(NULL, TrRu::error, TrRu::damagedInput);
+            this->clear();
+        }
+
         file.close();
+
+        fCount = source.count();
+        input = source;
     }
-    fCount = source.count();
-    input = source;
+    else
+    {
+        QMessageBox::warning(NULL, TrRu::error, TrRu::damagedFile);
+    }
 }
 
 void Packing::saveGeneratedSource(QString filename, FigureList gen)
@@ -70,6 +88,10 @@ void Packing::saveGeneratedSource(QString filename, FigureList gen)
 
         file.close();
     }
+    else
+    {
+        QMessageBox::warning(NULL, TrRu::error, TrRu::damagedFile);
+    }
 }
 
 void Packing::saveResult(QString filename)
@@ -85,5 +107,9 @@ void Packing::saveResult(QString filename)
         }
 
         file.close();
+    }
+    else
+    {
+        QMessageBox::warning(NULL, TrRu::error, TrRu::damagedFile);
     }
 }

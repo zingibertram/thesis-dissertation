@@ -1,9 +1,10 @@
 <RCC>
-    <qresource prefix="/gif">
+    <qresource prefix="/img">
         <file>resources/proc.gif</file>
+        <file>resources/app.ico</file>
+        <file>resources/app.png</file>
     </qresource>
     <qresource prefix="/input">
         <file>resources/gen.dat</file>
     </qresource>
-    <qresource prefix="/new/prefix1"/>
 </RCC>

@@ -3,36 +3,42 @@
 
 #include "utils.h"
 #include "packing.h"
+#include "translation.h"
 
+#include <QObject>
 #include <QGraphicsScene>
 #include <QTableWidget>
+#include <QMessageBox>
 
-class Packing
+class Packing : public QObject // модель упаковки
 {
+    Q_OBJECT // макрос для использования специальных функций
+
 public:
     Packing();
-    void readFile(QString filename);
-    void mainPacking(PackType t);
-    void displaySource(QGraphicsScene *gs, int fragIdx);
-    void displayResult(QTableWidget *ratio, QTableWidget *coord, QGraphicsScene *gs);
-    void saveResult(QString filename);
-    void newSource(QString filename);
-    void generateSource(QString filename, int cnt = 30);
+    void readFile(QString filename); // считать исходные данные
+    void mainPacking(PackType t); // упаковка указанным типом
+    void displaySource(QGraphicsScene *gs, int fragIdx); // вывести исходные данные
+    void displayResult(QTableWidget *ratio, QTableWidget *coord, QGraphicsScene *gs); // вывести результат
+    void saveResult(QString filename); // сохранить результат
+    void newSource(QString filename); // загрузить новые исходные данные
+    void generateSource(QString filename, int cnt = 30); // генерировать исходные данные
+    int sourceCount(); // количество ОМ
 
 private:
-    void figureFragmentation();
-    void gridNodes(Figure f);
-    Figure quantumFragmentation(DoubleList x, DoubleList y, Figure f);
-    Figure maxFigure(DoubleList x, DoubleList y, BoolGrid grid);
-    void figuresRect();
-    void packing(PackType t);
-    void lowBounds();
-    void prepareSource();
-    void clear();
-    void displayRatioResult(QTableWidget *ratio);
-    void displayCoordsResult(QTableWidget *coords);
-    void sourceIdxAccord();
-    void saveGeneratedSource(QString filename, FigureList gen);
+    void figureFragmentation(); // фрагментация ОМ - разбиение на минимальные прямоугольники и заполнение сетки
+    void gridNodes(Figure f); // узлы сетки ОМ
+    Figure quantumFragmentation(DoubleList x, DoubleList y, Figure f); // минимальное разбиение фигуры
+    Figure maxFigure(DoubleList x, DoubleList y, BoolGrid grid); // максимальное разбиение фигуры
+    void figuresRect(); // заполнение списка описанных вокруг ОМ прямоугольников
+    void packing(PackType t); // упаковка способом t
+    void lowBounds(); // вычисление нижних границ
+    void prepareSource(); // подготовка исходных данных к вычислению
+    void clear(); // очистка модели
+    void displayRatioResult(QTableWidget *ratio); // вывод результатов нижних границ
+    void displayCoordsResult(QTableWidget *coords); // вывод результатов упаковки
+    void sourceIdxAccord(); // соответствие исходного порядка ОМ и после изменения
+    void saveGeneratedSource(QString filename, FigureList gen); // сохранение сгенерированных данных
 
     FigureList source;
     FigureList input;
@@ -54,6 +60,9 @@ private:
     double square;
     FigurePacking pack;
     IntList sourceReshuffle;
+
+signals:
+    void packingEnd();
 };
 
 #endif // MAINPACK_H
