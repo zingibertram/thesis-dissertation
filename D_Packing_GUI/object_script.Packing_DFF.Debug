@@ -14,9 +14,11 @@ INPUT(
 ./debug\mainpackio.o
 ./debug\translation.o
 ./debug\knapsacksolver.o
+./debug\dialogabout.o
 ./debug\moc_mainwindow.o
 ./debug\moc_mainpack.o
 ./debug\moc_polygonview.o
 ./debug\moc_doingframe.o
+./debug\moc_dialogabout.o
 ./debug\qrc_images.o
 );

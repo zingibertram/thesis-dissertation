@@ -34,7 +34,8 @@ void Packing::lowBounds()
     QTime t;
     t.start();
 
-    double xsc = 1.0 / (square / stripWidth);
+
+    double xsc = 1.0 / stripLength;
     double ysc = 1.0 / stripWidth;
     data << pack.xCortToFig() << pack.yCortToFig();
     FigureVariantList dffData = data;
@@ -52,8 +53,8 @@ void Packing::lowBounds()
     }
 
     QList<bool> isw, ish;
-    isw << true << true << true << false << true;
-    ish << true << true << true << false << true;
+    isw << true << true << true << true << true;
+    ish << true << true << true << false << false;
 
     qDebug() << "Prepare to calc low bounds " << t.elapsed();
     t.start();
@@ -62,7 +63,14 @@ void Packing::lowBounds()
     dff1 = lb.dff_1();
     dff2 = lb.dff_2();
     dff3 = lb.dff_3();
-    dff4 = lb.dff_4();
+    dffMaximum = lb.dffMaximum();
+
+    packDensity = 0;
+    for (int l = 0; l < dffData[0].count(); ++l)
+    {
+        packDensity += figureSquareReal(dffData[0][l]);
+    }
+
     qDebug() << "Alg end " << t.elapsed();
 }
 
@@ -76,9 +84,13 @@ void Packing::packing(PackType t)
     case SEQUENCE : pack.pack(); break;
     }
 
-    xCoor = pack.xPositions();
-    yCoor = pack.yPositions();
-    square = pack.squarePacking();
+    if (!isCanceled)
+    {
+        xCoor = pack.xPositions();
+        yCoor = pack.yPositions();
+        square = pack.squarePacking();
+        stripLength = square / stripWidth;
+    }
 }
 
 void Packing::displaySource(QGraphicsScene *gs, int fragIdx)
@@ -108,8 +120,8 @@ void Packing::displaySource(QGraphicsScene *gs, int fragIdx)
 void Packing::displayRatioResult(QTableWidget *ratio)
 {
     QString num;
-    ratio->setRowCount(6);
-    ratio->setColumnCount(dff1.count() + 1);
+    ratio->setRowCount(4);
+    ratio->setColumnCount(6);
     ratio->setHorizontalHeaderItem(0, new QTableWidgetItem(TrRu::function));
     ratio->setHorizontalHeaderItem(1, new QTableWidgetItem(TrRu::sourceFrag));
     ratio->setHorizontalHeaderItem(2, new QTableWidgetItem(TrRu::minFrag));
@@ -119,17 +131,13 @@ void Packing::displayRatioResult(QTableWidget *ratio)
     ratio->setItem(0, 0, new QTableWidgetItem(TrRu::dff1));
     ratio->setItem(1, 0, new QTableWidgetItem(TrRu::dff2));
     ratio->setItem(2, 0, new QTableWidgetItem(TrRu::dff3));
-    ratio->setItem(3, 0, new QTableWidgetItem(TrRu::dff4));
-    ratio->setItem(4, 0, new QTableWidgetItem(TrRu::stripSquare));
-    ratio->setItem(4, 1, new QTableWidgetItem(TrRu::stripSquareNum));
-    ratio->setItem(5, 0, new QTableWidgetItem(TrRu::stripSquareReal));
-    ratio->setItem(5, 1, new QTableWidgetItem(num.setNum(square)));
+    ratio->setItem(3, 0, new QTableWidgetItem(TrRu::dffMaximum));
+    ratio->setItem(3, 1, new QTableWidgetItem(num.setNum(dffMaximum)));
     for (int i = 0; i < dff1.count(); ++i)
     {
         ratio->setItem(0, i + 1, new QTableWidgetItem(num.setNum(dff1[i])));
         ratio->setItem(1, i + 1, new QTableWidgetItem(num.setNum(dff2[i])));
         ratio->setItem(2, i + 1, new QTableWidgetItem(num.setNum(dff3[i])));
-        ratio->setItem(3, i + 1, new QTableWidgetItem(num.setNum(dff4[i])));
     }
     ratio->resizeColumnsToContents();
     ratio->resizeRowsToContents();
@@ -137,7 +145,7 @@ void Packing::displayRatioResult(QTableWidget *ratio)
 
 void Packing::displayCoordsResult(QTableWidget *coords)
 {
-    coords->setRowCount(fCount);
+    coords->setRowCount(fCount + 2);
     coords->setColumnCount(2);
 
     coords->setHorizontalHeaderItem(0, new QTableWidgetItem(TrRu::x));
@@ -149,6 +157,13 @@ void Packing::displayCoordsResult(QTableWidget *coords)
         coords->setItem(i, 0, new QTableWidgetItem(num.setNum(xCoor[i])));
         coords->setItem(i, 1, new QTableWidgetItem(num.setNum(yCoor[i])));
     }
+    coords->setItem(fCount, 0, new QTableWidgetItem(TrRu::dffSqr));
+    coords->setItem(fCount, 1, new QTableWidgetItem(num.setNum(packDensity)));
+    coords->setItem(fCount + 1, 0, new QTableWidgetItem(TrRu::stripLength));
+    coords->setItem(fCount + 1, 1, new QTableWidgetItem(num.setNum(square / stripWidth)));
+
+    coords->resizeColumnsToContents();
+    coords->resizeRowsToContents();
 }
 
 void Packing::displayResult(QTableWidget * ratio, QTableWidget *coord, QGraphicsScene *gs)
@@ -196,7 +211,7 @@ void Packing::prepareSource()
     {
         if (figuresBound[i].height() >= figuresBound[i].width())
         {
-            rotateFigure(&source[i]);
+            rotateFigure(&source[i], figuresBound[i].width());
         }
     }
     this->figuresRect();
@@ -220,7 +235,6 @@ void Packing::clear()
     dff1.clear();
     dff2.clear();
     dff3.clear();
-    dff4.clear();
     input.clear();
     sourceReshuffle.clear();
 
@@ -228,6 +242,8 @@ void Packing::clear()
     stripWidth = 0;
     square = 0;
     stripLength = INT_MAX;
+    packDensity = 0;
+    dffMaximum = 0;
 }
 
 void Packing::newSource(QString filename)
@@ -264,4 +280,9 @@ void Packing::sourceIdxAccord()
 int Packing::sourceCount()
 {
     return fCount;
+}
+
+bool Packing::isCalculated()
+{
+    return yCoor.count();
 }

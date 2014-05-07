@@ -23,6 +23,9 @@ MainWindow::MainWindow(QWidget *parent) :
     model.newSource(TrRu::defaultSource);
     this->addGenerateAction();
 
+    about = new DialogAbout(this);
+
+    this->connect(ui->action_About, SIGNAL(triggered()), about, SLOT(show()));
     this->connect(ui->action_Exit, SIGNAL(triggered()), this, SLOT(close()));
     this->connect(ui->action_Open, SIGNAL(triggered()), this, SLOT(action_Open_triggered()));
     this->connect(ui->action_Save, SIGNAL(triggered()), this, SLOT(action_Save_triggered()));
@@ -45,7 +48,9 @@ void MainWindow::action_Open_triggered()
     model.newSource(filename);
 
     ui->tableWidget_Coords->clear();
+    ui->tableWidget_Coords->setRowCount(0);
     ui->tableWidget_Result->clear();
+    ui->tableWidget_Result->setRowCount(0);
 
     ui->graphicsView_Result->setScene(NULL);
     ui->graphicsView_Source->setScene(NULL);
@@ -64,14 +69,24 @@ void MainWindow::saveImage(QString name, QGraphicsScene *gs)
 
 void MainWindow::action_Save_triggered()
 {
-    QString dirname = QFileDialog::getExistingDirectory(this, TrRu::saveResDir);
+    if (isCanceled || !model.isCalculated())
+    {
+        QMessageBox::warning(this, TrRu::error, TrRu::damagedRes);
+    }
+    else
+    {
+        QString dirname = QFileDialog::getExistingDirectory(this, TrRu::saveResDir);
 
-    model.saveResult(QDir(dirname).filePath(TrRu::resultDatFile));
+        if (dirname != "")
+        {
+            model.saveResult(QDir(dirname).filePath(TrRu::resultDatFile));
 
-    this->saveImage(QDir(dirname).filePath(TrRu::sourceMinImgFile), ui->graphicsView_Source_Min->scene());
-    this->saveImage(QDir(dirname).filePath(TrRu::sourceMaxImgFile), ui->graphicsView_Source_Max->scene());
-    this->saveImage(QDir(dirname).filePath(TrRu::sourceImgFile), ui->graphicsView_Source->scene());
-    this->saveImage(QDir(dirname).filePath(TrRu::resultImgFile), ui->graphicsView_Result->scene());
+            this->saveImage(QDir(dirname).filePath(TrRu::sourceMinImgFile), ui->graphicsView_Source_Min->scene());
+            this->saveImage(QDir(dirname).filePath(TrRu::sourceMaxImgFile), ui->graphicsView_Source_Max->scene());
+            this->saveImage(QDir(dirname).filePath(TrRu::sourceImgFile), ui->graphicsView_Source->scene());
+            this->saveImage(QDir(dirname).filePath(TrRu::resultImgFile), ui->graphicsView_Result->scene());
+        }
+    }
 }
 
 void MainWindow::action_DoBinary_triggered()

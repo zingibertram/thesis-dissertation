@@ -2,8 +2,9 @@
 
 #include <math.h>
 
-double dff_1_func(double x, int k)
+double dff_1_func(double x, double e)
 {
+    int k = e;
     double res = 0;
     double u = x * (k + 1);
     if (fabs((int)u - u) < eps)

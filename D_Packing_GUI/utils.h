@@ -27,12 +27,14 @@ typedef QPair<double, double> TupleCoordLength; // элемент кортежа
 
 typedef QPair<int, int> Position; // не помню для чего
 
+typedef double (*DffFunc)(double, double);
+
 extern const double eps; // погрешность для сравнения не целых чисел
 extern const double POS_INF; // длина полосы
 extern bool isCanceled; // флаг отмены выполнения вычислений
 
 // двойственные функции
-double dff_1_func(double x, int k);
+double dff_1_func(double x, double e);
 double dff_2_func(double x, double e);
 double dff_3_func(double x, double e);
 
@@ -45,7 +47,7 @@ QRectF rectByFigure(Figure f); // прямоугольник, описывающ
 double figureSquareReal(Figure f); // площадь ОМ
 double figureSquareRect(Figure f); // площадь описанного вокруг ОМ прямоугольника
 void sortSource(FigureList *source, bool (*lessFunc)(Figure, Figure)); // упорядочивание ОМ
-void rotateFigure(Figure *f); // вращение ОМ
+void rotateFigure(Figure *f, double w); // вращение ОМ
 
 //double rectSquare(QRectF r);
 QRectF expand(QRectF r, double m); // увеличение ОМ для удобства печати

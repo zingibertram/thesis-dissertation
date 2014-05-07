@@ -3,6 +3,7 @@
 
 #include "mainpack.h"
 #include "doingframe.h"
+#include "dialogabout.h"
 
 #include <QMainWindow>
 #include <QTime>
@@ -41,6 +42,7 @@ private:
 
     Packing model; // модель упаковки
     DoingFrame *processFrame; // окно с кнопкой "Отмена"
+    DialogAbout *about; // диалоговое окно с информацией о разработчике
 };
 
 #endif // MAINWINDOW_H

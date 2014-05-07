@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const double eps = 0.0001;
+const double eps = 0.000001;
 
 const double POS_INF = 1.0E36;
 
@@ -266,10 +266,10 @@ BoolGrid copyGrid(BoolGrid grid, int xcnt, int ycnt)
     return res;
 }
 
-void rotateFigure(Figure *f)
+void rotateFigure(Figure *f, double w)
 {
     for (int i = 0; i < f->count(); ++i)
     {
-        (*f)[i] = QRectF((*f)[i].y(), (*f)[i].x(), (*f)[i].height(), (*f)[i].width());
+        (*f)[i] = QRectF((*f)[i].y(), w - (*f)[i].x() - (*f)[i].width(), (*f)[i].height(), (*f)[i].width());
     }
 }

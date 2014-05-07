@@ -9,91 +9,85 @@ LowBounds::LowBounds(FigureVariantList d, QList<bool> iswarg, QList<bool> isharg
     data = d;
     isw = iswarg;
     ish = isharg;
+    dffMax = 0;
+
+    variantCount = d.count();
+    countByVariant.clear();
+    widthByDataVariant.clear();
+    heightByDataVariant.clear();
+    for (int i = 0; i < d.count(); ++i)
+    {
+        DoubleList lsw, lsh;
+        for (int l = 0; l < d[i].count(); ++l)
+        {
+            for (int j = 0; j < d[i][l].count(); ++j)
+            {
+                lsw << d[i][l][j].width();
+                lsh << d[i][l][j].height();
+            }
+        }
+        widthByDataVariant << lsw;
+        heightByDataVariant << lsh;
+        countByVariant << lsw.count();
+    }
 }
 
 DoubleList LowBounds::dff_1()
 {
-    DoubleList cnt;
-    double byk;
-    double w, h, s;
-    for (int i = 0; i < data.count(); ++i)
-    {
-        byk = 0;
-        for (int k = 1; k < 1000; ++k)
-        {
-            s = 0;
-            for (int l = 0; l < data[i].count(); ++l)
-            {
-                for (int j = 0; j < data[i][l].count(); ++j)
-                {
-                    w = isw[i] ? dff_1_func(data[i][l][j].width(), k) : data[i][l][j].width();
-                    h = ish[i] ? dff_1_func(data[i][l][j].height(), k) : data[i][l][j].height();
-                    s += w * h;
-                }
-            }
-            if (s > byk)
-            {
-                byk = s;
-            }
-        }
-        cnt.append(byk);
-    }
-    return cnt;
+    return this->dff(1, 1000, 1, dff_1_func);
 }
 
 DoubleList LowBounds::dff_2()
 {
-    DoubleList cnt;
-    double byk;
-    double w, h, s;
-    for (int i = 0; i < data.count(); ++i)
-    {
-        byk = 0;
-        for (double k = 0.0; k <= 0.5; k += 0.0001)
-        {
-            s = 0;
-            for (int l = 0; l < data[i].count(); ++l)
-            {
-                for (int j = 0; j < data[i][l].count(); ++j)
-                {
-                    w = isw[i] ? dff_2_func(data[i][l][j].width(), k) : data[i][l][j].width();
-                    h = ish[i] ? dff_2_func(data[i][l][j].height(), k) : data[i][l][j].height();
-                    s += w * h;
-                }
-            }
-            if (s > byk)
-            {
-                byk = s;
-            }
-        }
-        cnt.append(byk);
-    }
-    return cnt;
+    double p = 0.0001;
+    return this->dff(0, 0.5 + p - eps, p, dff_2_func);
 }
 
 DoubleList LowBounds::dff_3()
 {
-    DoubleList cnt;
+    return this->dff(0, 0.5, 0.0001, dff_3_func);
+}
+
+DoubleList LowBounds::dff(double minParam, double maxParam, double plusParam, DffFunc func)
+{
+    DoubleList cnt, tmpwls, tmphls;
     double byk;
     double w, h, s;
-    for (int i = 0; i < data.count(); ++i)
+    int cmp;
+    for (int i = 0; i < variantCount; ++i)
     {
         byk = 0;
-        for (double k = 0.0; k < 0.5; k += 0.0001)
+        for (double p = minParam; p < maxParam; p += plusParam)
         {
             s = 0;
-            for (int l = 0; l < data[i].count(); ++l)
+            tmpwls.clear();
+            tmphls.clear();
+
+            for (int j = 0; j < countByVariant[i]; ++j)
             {
-                for (int j = 0; j < data[i][l].count(); ++j)
-                {
-                    w = isw[i] ? dff_3_func(data[i][l][j].width(), k) : data[i][l][j].width();
-                    h = ish[i] ? dff_3_func(data[i][l][j].height(), k) : data[i][l][j].height();
-                    s += w * h;
-                }
+                w = isw[i] ? func(widthByDataVariant[i][j], p) : widthByDataVariant[i][j];
+                h = ish[i] ? func(heightByDataVariant[i][j], p) : heightByDataVariant[i][j];
+                s += w * h;
+
+                tmpwls << w;
+                tmphls << h;
             }
             if (s > byk)
             {
                 byk = s;
+
+                cmp = epsCompare(byk, dffMax);
+                if (cmp > -1)
+                {
+                    dffMax = byk;
+                }
+                if (cmp == 1 || (!cmp && owls.count() > widthByDataVariant.count()))
+                {
+                    owls = widthByDataVariant[i];
+                    wls = tmpwls;
+                    ohls = heightByDataVariant[i];
+                    hls = tmphls;
+                }
             }
         }
         cnt.append(byk);
@@ -101,18 +95,26 @@ DoubleList LowBounds::dff_3()
     return cnt;
 }
 
-DoubleList LowBounds::dff_4()
+double LowBounds::maximizeDff()
 {
-    DoubleList cnt;
-    double s;
-    for (int i = 0; i < data.count(); ++i)
+    int cnt = owls.count();
+    double resw, resh;
+    double square = 0;
+    KnapsackSolver wslvr(owls, wls, 1.0);
+    KnapsackSolver hslvr(ohls, hls, 1.0);
+
+    for (int i = 0; i < cnt; ++i)
     {
-        s = 0;
-        for (int l = 0; l < data[i].count(); ++l)
-        {
-            s += figureSquareReal(data[i][l]);
-        }
-        cnt.append(s);
+        resw = 1.0 - wslvr.solve(i);
+        resh = 1.0 - hslvr.solve(i);
+
+        square += resw * resh;
     }
-    return cnt;
+    return square;
+}
+
+double LowBounds::dffMaximum()
+{
+//    dffMax = this->maximizeDff();
+    return dffMax;
 }

@@ -1,21 +1,32 @@
 #include "knapsacksolver.h"
 
+KnapsackSolver::KnapsackSolver()
+{
+    count = 0;
+}
+
 KnapsackSolver::KnapsackSolver(DoubleList w, DoubleList p, double c)
 {
     weight = w;
     coast = p;
-    capacity = c;
+    allCapacity = c;
     count = std::min(w.count(), p.count());
+
+    idxAccord.clear();
+    ratio.clear();
 
     for (int i = 0; i < count; ++i)
     {
         ratio << coast[i] / weight[i];
+        idxAccord << i;
     }
     this->sortByRatio();
 }
 
-double KnapsackSolver::solve()
+double KnapsackSolver::solve(int idx)
 {
+    withoutIdx = idxAccord.indexOf(idx);
+    capacity = allCapacity - weight[withoutIdx];
     flag = true;
     currentWeight = 0;
     currentCoast = 0;
@@ -38,6 +49,11 @@ double KnapsackSolver::solve()
         {
             for(int  i = index; i < count; ++i)
             {
+                if (i == withoutIdx)
+                {
+                    continue;
+                }
+
                 if(currentWeight + weight[i] <= capacity)
                 {
                     currentWeight += weight[i];
@@ -79,6 +95,7 @@ void KnapsackSolver::sortByRatio()
                 ratio.swap(i, j);
                 coast.swap(i, j);
                 weight.swap(i, j);
+                idxAccord.swap(i, j);
             }
         }
     }
@@ -88,6 +105,11 @@ bool KnapsackSolver::stepDown()
 {
     for(int i = count - 1; i >= 0; --i)
     {
+        if (i == withoutIdx)
+        {
+            continue;
+        }
+
         if(isPack[i])
         {
             currentWeight -= weight[i];
@@ -108,13 +130,24 @@ double KnapsackSolver::maxRatio()
     int i = 0;
     for (; i < count; ++i)
     {
+        if (i == withoutIdx)
+        {
+            continue;
+        }
+
         if (isPack[i])
         {
             break;
         }
     }
+
     for (; i < count; ++i)
     {
+        if (i == withoutIdx)
+        {
+            continue;
+        }
+
         if (!isPack[i])
         {
             return ratio[i];

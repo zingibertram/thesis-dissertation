@@ -6,8 +6,9 @@
 class KnapsackSolver // решение задачи о рюкзаке, нужно для максимизации двойственных функций
 {
 public:
+    KnapsackSolver();
     KnapsackSolver(DoubleList w, DoubleList p, double c);
-    double solve(); // решение методом динамического программирования с использованием удельной цены объектов
+    double solve(int idx); // решение методом динамического программирования с использованием удельной цены объектов
 
 private:
     void sortByRatio(); // упорядочивание по удельной цене
@@ -17,16 +18,20 @@ private:
     DoubleList weight;
     DoubleList coast;
     double capacity;
+    double allCapacity;
     int count;
 
     DoubleList ratio;
     IntList isPack;
+    IntList idxAccord;
     double currentWeight;
     double currentCoast;
     double maxCost;
     bool flag;
     int prevMaxIdx;
     int index;
+
+    int withoutIdx;
 };
 
 #endif // KNAPSACKSOLVER_H

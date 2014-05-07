@@ -16,10 +16,10 @@ public:
     static const QString dff1;
     static const QString dff2;
     static const QString dff3;
-    static const QString dff4;
-    static const QString stripSquare;
+    static const QString dffSqr;
+    static const QString stripLength;
     static const QString stripSquareNum;
-    static const QString stripSquareReal;
+    static const QString dffMaximum;
     static const QString y;
     static const QString x;
     static const QString dataFiles;
@@ -38,6 +38,7 @@ public:
     static const QString error;
     static const QString damagedInput;
     static const QString damagedCalc;
+    static const QString damagedRes;
 };
 
 #endif // TRANSLATION_H

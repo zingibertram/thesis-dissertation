@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-TARGET = D_Packing_GUI
+TARGET = Packing_DFF
 TEMPLATE = app
 
 
@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     utilsdff.cpp \
     mainpackio.cpp \
     translation.cpp \
-    knapsacksolver.cpp
+    knapsacksolver.cpp \
+    dialogabout.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
@@ -35,10 +36,12 @@ HEADERS  += mainwindow.h \
     polygonview.h \
     doingframe.h \
     translation.h \
-    knapsacksolver.h
+    knapsacksolver.h \
+    dialogabout.h
 
 FORMS    += mainwindow.ui \
-    doingframe.ui
+    doingframe.ui \
+    dialogabout.ui
 
 OTHER_FILES += \
     data.in \
@@ -47,4 +50,5 @@ OTHER_FILES += \
 RESOURCES += \
     images.qrc
 
+# добавляет иконку для ехе-файла в windows
 RC_FILE = exeicon.rc

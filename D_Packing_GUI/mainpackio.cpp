@@ -105,6 +105,8 @@ void Packing::saveResult(QString filename)
         {
             out << xCoor[sourceReshuffle[i]] << " " << yCoor[sourceReshuffle[i]] << endl;
         }
+        out << stripLength << endl;
+        out << packDensity << endl;
 
         file.close();
     }

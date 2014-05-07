@@ -24,6 +24,7 @@ public:
     void newSource(QString filename); // загрузить новые исходные данные
     void generateSource(QString filename, int cnt = 30); // генерировать исходные данные
     int sourceCount(); // количество ОМ
+    bool isCalculated(); // проверка, произведены ли вычисления
 
 private:
     void figureFragmentation(); // фрагментация ОМ - разбиение на минимальные прямоугольники и заполнение сетки
@@ -51,12 +52,13 @@ private:
     DoubleList yCoor;
     double stripWidth;
     double stripLength;
+    double packDensity;
     int fCount;
     static const int MULT = 100;
     DoubleList dff1;
     DoubleList dff2;
     DoubleList dff3;
-    DoubleList dff4;
+    double dffMaximum;
     double square;
     FigurePacking pack;
     IntList sourceReshuffle;

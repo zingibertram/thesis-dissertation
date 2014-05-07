@@ -187,20 +187,15 @@
     <addaction name="separator"/>
     <addaction name="menu_Generate"/>
    </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Помощь</string>
+    </property>
+    <addaction name="action_About"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Actions"/>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
+   <addaction name="menu"/>
   </widget>
   <action name="action_Open">
    <property name="text">
@@ -240,6 +235,11 @@
   <action name="action_Gen">
    <property name="text">
     <string>Генерировать</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>О программе</string>
    </property>
   </action>
  </widget>
