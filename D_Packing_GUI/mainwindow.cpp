@@ -45,17 +45,20 @@ MainWindow::~MainWindow()
 void MainWindow::action_Open_triggered()
 {
     QString filename = QFileDialog::getOpenFileName(this, TrRu::openDlgHead, QString(), TrRu::dataFiles);
-    model.newSource(filename);
+    if (filename != "")
+    {
+        model.newSource(filename);
 
-    ui->tableWidget_Coords->clear();
-    ui->tableWidget_Coords->setRowCount(0);
-    ui->tableWidget_Result->clear();
-    ui->tableWidget_Result->setRowCount(0);
+        ui->tableWidget_Coords->clear();
+        ui->tableWidget_Coords->setRowCount(0);
+        ui->tableWidget_Result->clear();
+        ui->tableWidget_Result->setRowCount(0);
 
-    ui->graphicsView_Result->setScene(NULL);
-    ui->graphicsView_Source->setScene(NULL);
-    ui->graphicsView_Source_Max->setScene(NULL);
-    ui->graphicsView_Source_Min->setScene(NULL);
+        ui->graphicsView_Result->setScene(NULL);
+        ui->graphicsView_Source->setScene(NULL);
+        ui->graphicsView_Source_Max->setScene(NULL);
+        ui->graphicsView_Source_Min->setScene(NULL);
+    }
 }
 
 void MainWindow::saveImage(QString name, QGraphicsScene *gs)
@@ -111,7 +114,7 @@ void MainWindow::calculate(PackType t)
 
     this->setControlsEnabled(false);
 
-    model.mainPacking(t);
+    model.mainPacking(t, ui->checkBox_Maximize->isChecked());
 
     this->setControlsEnabled(true);
 

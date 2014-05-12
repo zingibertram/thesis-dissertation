@@ -68,6 +68,11 @@ double KnapsackSolver::solve(int idx)
             flag = true;
         }
 
+        if (allCapacity - maxCost <= coast[withoutIdx])
+        {
+            break;
+        }
+
         //mark
         if(!flag || currentCoast < maxCost)
         {
@@ -115,7 +120,7 @@ bool KnapsackSolver::stepDown()
             currentWeight -= weight[i];
             currentCoast -= coast[i];
             isPack[i] = 0;
-            if (i != count - 1)
+//            if (i != count - 1)
             {
                 index = i + 1;
                 return true;

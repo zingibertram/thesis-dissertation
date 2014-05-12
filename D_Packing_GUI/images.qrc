@@ -6,5 +6,6 @@
     </qresource>
     <qresource prefix="/input">
         <file>resources/gen.dat</file>
+        <file>resources/100_60.dat</file>
     </qresource>
 </RCC>

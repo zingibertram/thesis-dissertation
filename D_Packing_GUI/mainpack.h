@@ -17,7 +17,7 @@ class Packing : public QObject // модель упаковки
 public:
     Packing();
     void readFile(QString filename); // считать исходные данные
-    void mainPacking(PackType t); // упаковка указанным типом
+    void mainPacking(PackType t, bool isMaximize); // упаковка указанным типом
     void displaySource(QGraphicsScene *gs, int fragIdx); // вывести исходные данные
     void displayResult(QTableWidget *ratio, QTableWidget *coord, QGraphicsScene *gs); // вывести результат
     void saveResult(QString filename); // сохранить результат
@@ -33,13 +33,14 @@ private:
     Figure maxFigure(DoubleList x, DoubleList y, BoolGrid grid); // максимальное разбиение фигуры
     void figuresRect(); // заполнение списка описанных вокруг ОМ прямоугольников
     void packing(PackType t); // упаковка способом t
-    void lowBounds(); // вычисление нижних границ
+    void lowBounds(bool isMaximize); // вычисление нижних границ
     void prepareSource(); // подготовка исходных данных к вычислению
     void clear(); // очистка модели
     void displayRatioResult(QTableWidget *ratio); // вывод результатов нижних границ
     void displayCoordsResult(QTableWidget *coords); // вывод результатов упаковки
     void sourceIdxAccord(); // соответствие исходного порядка ОМ и после изменения
     void saveGeneratedSource(QString filename, FigureList gen); // сохранение сгенерированных данных
+    void calcSourceSquare(); // вычисление суммарной площади ОМ
 
     FigureList source;
     FigureList input;
@@ -59,7 +60,8 @@ private:
     DoubleList dff2;
     DoubleList dff3;
     double dffMaximum;
-    double square;
+    double orthoSquare;
+    double stripSquare;
     FigurePacking pack;
     IntList sourceReshuffle;
 

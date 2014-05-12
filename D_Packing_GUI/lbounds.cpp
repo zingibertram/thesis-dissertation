@@ -2,34 +2,17 @@
 
 #include <math.h>
 
+#include <QApplication>
+
 using namespace std;
 
-LowBounds::LowBounds(FigureVariantList d, QList<bool> iswarg, QList<bool> isharg)
+LowBounds::LowBounds(DoubleGrid w, DoubleGrid h, IntList cnt)
 {
-    data = d;
-    isw = iswarg;
-    ish = isharg;
     dffMax = 0;
-
-    variantCount = d.count();
-    countByVariant.clear();
-    widthByDataVariant.clear();
-    heightByDataVariant.clear();
-    for (int i = 0; i < d.count(); ++i)
-    {
-        DoubleList lsw, lsh;
-        for (int l = 0; l < d[i].count(); ++l)
-        {
-            for (int j = 0; j < d[i][l].count(); ++j)
-            {
-                lsw << d[i][l][j].width();
-                lsh << d[i][l][j].height();
-            }
-        }
-        widthByDataVariant << lsw;
-        heightByDataVariant << lsh;
-        countByVariant << lsw.count();
-    }
+    countByVariant = cnt;
+    variantCount = countByVariant.count();
+    widthByDataVariant = w;
+    heightByDataVariant = h;
 }
 
 DoubleList LowBounds::dff_1()
@@ -50,26 +33,24 @@ DoubleList LowBounds::dff_3()
 
 DoubleList LowBounds::dff(double minParam, double maxParam, double plusParam, DffFunc func)
 {
-    DoubleList cnt, tmpwls, tmphls;
+    DoubleList cnt, tmphls;
     double byk;
-    double w, h, s;
+    double h, s;
     int cmp;
+    double sub = 0;
     for (int i = 0; i < variantCount; ++i)
     {
         byk = 0;
         for (double p = minParam; p < maxParam; p += plusParam)
         {
             s = 0;
-            tmpwls.clear();
             tmphls.clear();
-
             for (int j = 0; j < countByVariant[i]; ++j)
             {
-                w = isw[i] ? func(widthByDataVariant[i][j], p) : widthByDataVariant[i][j];
-                h = ish[i] ? func(heightByDataVariant[i][j], p) : heightByDataVariant[i][j];
-                s += w * h;
+                h = func(heightByDataVariant[i][j], p);
+                s += widthByDataVariant[i][j] * h;
+                sub = fabs(h - heightByDataVariant[i][j]) > sub ? fabs(h - heightByDataVariant[i][j]) : sub;
 
-                tmpwls << w;
                 tmphls << h;
             }
             if (s > byk)
@@ -79,12 +60,14 @@ DoubleList LowBounds::dff(double minParam, double maxParam, double plusParam, Df
                 cmp = epsCompare(byk, dffMax);
                 if (cmp > -1)
                 {
-                    dffMax = byk;
+                    dffMax = sub;
+//                    owls = widthByDataVariant[i];
+//                    ohls = heightByDataVariant[i];
+//                    hls = tmphls;
                 }
                 if (cmp == 1 || (!cmp && owls.count() > widthByDataVariant.count()))
                 {
                     owls = widthByDataVariant[i];
-                    wls = tmpwls;
                     ohls = heightByDataVariant[i];
                     hls = tmphls;
                 }
@@ -98,23 +81,31 @@ DoubleList LowBounds::dff(double minParam, double maxParam, double plusParam, Df
 double LowBounds::maximizeDff()
 {
     int cnt = owls.count();
-    double resw, resh;
+    double resh, newh;
     double square = 0;
-    KnapsackSolver wslvr(owls, wls, 1.0);
     KnapsackSolver hslvr(ohls, hls, 1.0);
 
     for (int i = 0; i < cnt; ++i)
     {
-        resw = 1.0 - wslvr.solve(i);
-        resh = 1.0 - hslvr.solve(i);
+        QApplication::processEvents();
+        if (isCanceled)
+        {
+            isCanceled = false;
+            break;
+        }
+        newh = 1.0 - hslvr.solve(i);
+        resh = newh > hls[i] ? newh : hls[i];
 
-        square += resw * resh;
+        square += owls[i] * resh;
     }
     return square;
 }
 
-double LowBounds::dffMaximum()
+double LowBounds::dffMaximum(bool isMaximize)
 {
-//    dffMax = this->maximizeDff();
+    if (isMaximize)
+    {
+        dffMax = this->maximizeDff();
+    }
     return dffMax;
 }

@@ -258,7 +258,7 @@ Cortage* FigurePacking::insertCortage(Cortage *src, Cortage *ins)
 {
     Cortage *res = new Cortage(*src);
 
-    // СЃРґРµР»Р°С‚СЊ Р»РёРЅРµР№РЅРѕР№
+    // сделать линейной
     int cmp;
     int j = 0;
     for (int i = 0; i < ins->count(); ++i)
@@ -294,7 +294,7 @@ Cortage* FigurePacking::insertCortage(Cortage *src, Cortage *ins)
     return res;
 }
 
-// РЅРµРѕР±С…РѕРґРёРјРѕРµ СѓСЃР»РѕРІРёРµ
+// необходимое условие
 bool FigurePacking::checkSize(Cortage *x, double w, double l)
 {
     TupleCoordLength tx = (*x)[x->count() - 1];
@@ -314,7 +314,7 @@ bool FigurePacking::checkSize(Cortage *x, double w, double l)
     return bw && bl;
 }
 
-// РґРѕСЃС‚Р°С‚РѕС‡РЅРѕРµ СѓСЃР»РѕРІРёРµ
+// достаточное условие
 bool FigurePacking::checkOverlap(double nx, double ny, int cnt)
 {
     if (nx < 0.0 || ny < 0.0)
@@ -459,7 +459,7 @@ FigureList FigurePacking::yCortToFig()
         prev = 0.0;
         for (int j = 0; j < yCortage[i].count(); ++j)
         {
-            f << QRectF(0.0, prev, yCortage[i][j].second, yCortage[i][j].first - prev);
+            f << QRectF(prev, 0.0, yCortage[i][j].first - prev, yCortage[i][j].second);
             prev = yCortage[i][j].first;
         }
         res << f;

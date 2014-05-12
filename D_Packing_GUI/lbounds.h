@@ -9,28 +9,23 @@
 class LowBounds // вычисление нижних границ
 {
 public:
-    LowBounds(FigureVariantList d, QList<bool> iswarg, QList<bool> isharg); // d - варианты разбиений ОМ
-                                                                            // iswarg, isharg - применять или нет двойственную функцию к ширине/высоте
+    LowBounds(DoubleGrid w, DoubleGrid h, IntList cnt); // w[i] (h[i]) - ширинs (высоты) всех прямоугольников всех ОМ
+                                                        // cnt - количество прямоугольников в соответствующем варианте
     // вычисление двойственных функций
     DoubleList dff_1();
     DoubleList dff_2();
     DoubleList dff_3();
-    double dffMaximum(); // максимизированная оценка
+    double dffMaximum(bool isMaximize); // максимизированная оценка
 
 private:
     double maximizeDff(); // максимизация DFF
 
     DoubleList dff(double minParam, double maxParam, double plusParam, DffFunc func);
 
-    FigureVariantList data;
-    QList<bool> isw;
-    QList<bool> ish;
-
     double dffMax;
 
     // максимальные значения двойственной функции и соответствующие им размеры
     DoubleList owls;
-    DoubleList wls;
     DoubleList ohls;
     DoubleList hls;
 

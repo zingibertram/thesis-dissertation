@@ -18,7 +18,8 @@ public:
     static const QString dff3;
     static const QString dffSqr;
     static const QString stripLength;
-    static const QString stripSquareNum;
+    static const QString stripSquare;
+    static const QString orthoPolygonSquare;
     static const QString dffMaximum;
     static const QString y;
     static const QString x;
