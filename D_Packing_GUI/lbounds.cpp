@@ -3,6 +3,7 @@
 #include <math.h>
 
 #include <QApplication>
+#include <QDebug>
 
 using namespace std;
 
@@ -49,7 +50,8 @@ DoubleList LowBounds::dff(double minParam, double maxParam, double plusParam, Df
             {
                 h = func(heightByDataVariant[i][j], p);
                 s += widthByDataVariant[i][j] * h;
-                sub = fabs(h - heightByDataVariant[i][j]) > sub ? fabs(h - heightByDataVariant[i][j]) : sub;
+//                sub = fabs(h - heightByDataVariant[i][j]) > sub ? fabs(h - heightByDataVariant[i][j]) : sub;
+                sub = heightByDataVariant[i][j] > sub ? heightByDataVariant[i][j] : sub;
 
                 tmphls << h;
             }
@@ -57,20 +59,20 @@ DoubleList LowBounds::dff(double minParam, double maxParam, double plusParam, Df
             {
                 byk = s;
 
-                cmp = epsCompare(byk, dffMax);
+                cmp = epsCompare(sub, dffMax);
                 if (cmp > -1)
                 {
                     dffMax = sub;
-//                    owls = widthByDataVariant[i];
-//                    ohls = heightByDataVariant[i];
-//                    hls = tmphls;
-                }
-                if (cmp == 1 || (!cmp && owls.count() > widthByDataVariant.count()))
-                {
                     owls = widthByDataVariant[i];
                     ohls = heightByDataVariant[i];
                     hls = tmphls;
                 }
+//                if (cmp == 1 || (!cmp && owls.count() > widthByDataVariant.count()))
+//                {
+//                    owls = widthByDataVariant[i];
+//                    ohls = heightByDataVariant[i];
+//                    hls = tmphls;
+//                }
             }
         }
         cnt.append(byk);
@@ -85,6 +87,7 @@ double LowBounds::maximizeDff()
     double square = 0;
     KnapsackSolver hslvr(ohls, hls, 1.0);
 
+    qDebug() << "Maximize " << cnt << " bounds";
     for (int i = 0; i < cnt; ++i)
     {
         QApplication::processEvents();
@@ -93,8 +96,10 @@ double LowBounds::maximizeDff()
             isCanceled = false;
             break;
         }
-        newh = 1.0 - hslvr.solve(i);
-        resh = newh > hls[i] ? newh : hls[i];
+        resh = 1.0 - hslvr.solve(i);
+//        resh = newh > hls[i] ? newh : hls[i];
+
+        qDebug() << "Old " << hls[i] << "; new " << resh;
 
         square += owls[i] * resh;
     }

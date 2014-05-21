@@ -41,7 +41,7 @@ double KnapsackSolver::solve(int idx)
     do
     {
         // stepup
-        if ((capacity - currentWeight) * this->maxRatio() + currentCoast < maxCost)
+        if ((capacity - currentWeight) * this->maxRatio() + currentCoast <= maxCost)
         {
             flag = false;
         }
@@ -68,10 +68,10 @@ double KnapsackSolver::solve(int idx)
             flag = true;
         }
 
-        if (allCapacity - maxCost <= coast[withoutIdx])
-        {
-            break;
-        }
+//        if (allCapacity - maxCost <= coast[withoutIdx])
+//        {
+//            break;
+//        }
 
         //mark
         if(!flag || currentCoast < maxCost)
@@ -132,20 +132,7 @@ bool KnapsackSolver::stepDown()
 
 double KnapsackSolver::maxRatio()
 {
-    int i = 0;
-    for (; i < count; ++i)
-    {
-        if (i == withoutIdx)
-        {
-            continue;
-        }
-
-        if (isPack[i])
-        {
-            break;
-        }
-    }
-
+    int i = index;
     for (; i < count; ++i)
     {
         if (i == withoutIdx)
@@ -158,5 +145,18 @@ double KnapsackSolver::maxRatio()
             return ratio[i];
         }
     }
+
+//    for (; i < count; ++i)
+//    {
+//        if (i == withoutIdx)
+//        {
+//            continue;
+//        }
+
+//        if (!isPack[i])
+//        {
+//            return ratio[i];
+//        }
+//    }
     return 0;
 }
