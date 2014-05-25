@@ -173,19 +173,19 @@ bool generateUnequal(DoubleList *ls)
     old = ls->operator [](ls->count() - 1);
     p = drand(5);
     d = old + p;
-    if (d < 1.0 + eps)
-    {
+//    if (d < 1.0 + eps)
+//    {
         ls->append(d);
         return true;
-    }
-    return false;
+//    }
+//    return false;
 }
 
 double drand(int accuracy)
 {
     double p = qPow(10, accuracy);
     double a = (qrand() % ((int)p + 1)) / p;
-    double b = (qrand() % 1000) / 2500.0 + 0.002;
+    double b = (qrand() % 100) / 180.0 + 0.002;
     return b;
 }
 

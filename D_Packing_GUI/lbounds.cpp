@@ -18,6 +18,11 @@ LowBounds::LowBounds(DoubleGrid w, DoubleGrid h, IntList cnt)
 
 DoubleList LowBounds::dff_1()
 {
+    owls = 0;
+    ohls = 0;
+    hls.clear();
+    dffMax = 0;
+    subMax = 0;
     return this->dff(1, 1000, 1, dff_1_func);
 }
 
@@ -36,7 +41,7 @@ DoubleList LowBounds::dff(double minParam, double maxParam, double plusParam, Df
 {
     DoubleList cnt, tmphls;
     double byk;
-    double h, s;
+    double h, s, tmpsub;
     int cmp;
     double sub = 0;
     for (int i = 0; i < variantCount; ++i)
@@ -49,32 +54,28 @@ DoubleList LowBounds::dff(double minParam, double maxParam, double plusParam, Df
             for (int j = 0; j < countByVariant[i]; ++j)
             {
                 h = func(heightByDataVariant[i][j], p);
+//                widthByDataVariant[i][j] = func(widthByDataVariant[i][j], p);
                 s += widthByDataVariant[i][j] * h;
-//                sub = fabs(h - heightByDataVariant[i][j]) > sub ? fabs(h - heightByDataVariant[i][j]) : sub;
-                sub = heightByDataVariant[i][j] > sub ? heightByDataVariant[i][j] : sub;
+
+                tmpsub = h - heightByDataVariant[i][j];
+                sub = tmpsub > sub ? tmpsub : sub;
 
                 tmphls << h;
             }
-            if (s > byk)
+            byk = s > byk ? s : byk;
+            cmp = epsCompare(byk, dffMax);
+            if (cmp > -1)
             {
-                byk = s;
-
-                cmp = epsCompare(sub, dffMax);
-                if (cmp > -1)
+                dffMax = byk;
+                if (cmp == 1 || (!hls.count() || hls.count() > tmphls.count()))
                 {
-                    dffMax = sub;
-                    owls = widthByDataVariant[i];
-                    ohls = heightByDataVariant[i];
+                    owls = i;
+                    ohls = i;
                     hls = tmphls;
                 }
-//                if (cmp == 1 || (!cmp && owls.count() > widthByDataVariant.count()))
-//                {
-//                    owls = widthByDataVariant[i];
-//                    ohls = heightByDataVariant[i];
-//                    hls = tmphls;
-//                }
             }
         }
+//        dffMax = byk > dffMax ? byk : dffMax;
         cnt.append(byk);
     }
     return cnt;
@@ -82,10 +83,10 @@ DoubleList LowBounds::dff(double minParam, double maxParam, double plusParam, Df
 
 double LowBounds::maximizeDff()
 {
-    int cnt = owls.count();
+    int cnt = widthByDataVariant[owls].count();
     double resh, newh;
     double square = 0;
-    KnapsackSolver hslvr(ohls, hls, 1.0);
+    KnapsackSolver hslvr(heightByDataVariant[ohls], hls, 1.0);
 
     qDebug() << "Maximize " << cnt << " bounds";
     for (int i = 0; i < cnt; ++i)
@@ -96,12 +97,12 @@ double LowBounds::maximizeDff()
             isCanceled = false;
             break;
         }
-        resh = 1.0 - hslvr.solve(i);
-//        resh = newh > hls[i] ? newh : hls[i];
+        newh = 1.0 - hslvr.solve(i);
+        resh = newh > hls[i] ? newh : hls[i];
 
         qDebug() << "Old " << hls[i] << "; new " << resh;
 
-        square += owls[i] * resh;
+        square += widthByDataVariant[owls][i] * resh;
     }
     return square;
 }
@@ -110,7 +111,8 @@ double LowBounds::dffMaximum(bool isMaximize)
 {
     if (isMaximize)
     {
-        dffMax = this->maximizeDff();
+        double maximized = this->maximizeDff();
+        dffMax = maximized > dffMax ? maximized : dffMax;
     }
     return dffMax;
 }

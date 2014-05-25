@@ -23,10 +23,11 @@ private:
     DoubleList dff(double minParam, double maxParam, double plusParam, DffFunc func);
 
     double dffMax;
+    double subMax;
 
     // максимальные значения двойственной функции и соответствующие им размеры
-    DoubleList owls;
-    DoubleList ohls;
+    int owls;
+    int ohls;
     DoubleList hls;
 
     DoubleGrid widthByDataVariant;

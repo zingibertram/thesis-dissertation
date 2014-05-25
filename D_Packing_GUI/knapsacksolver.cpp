@@ -68,10 +68,10 @@ double KnapsackSolver::solve(int idx)
             flag = true;
         }
 
-//        if (allCapacity - maxCost <= coast[withoutIdx])
-//        {
-//            break;
-//        }
+        if (allCapacity - maxCost <= coast[withoutIdx])
+        {
+            break;
+        }
 
         //mark
         if(!flag || currentCoast < maxCost)

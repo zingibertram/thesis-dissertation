@@ -200,13 +200,13 @@ Figure FigureGenerator::generateFigure(int cx, int cy)
 
 FigureList FigureGenerator::generateSource(int cnt)
 {
-//    srand((unsigned)clock());
+    srand((unsigned)clock());
     FigureList res;
     int cx, cy;
     for (int i = 0; i < cnt; ++i)
     {
-        cx = rand () % 20 + 1;
-        cy = rand () % 20 + 1;
+        cx = rand () % 4 + 1;
+        cy = rand () % 4 + 1;
         res.append(FigureGenerator::generateFigure(cx, cy));
     }
     return res;

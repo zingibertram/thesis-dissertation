@@ -31,7 +31,10 @@ void Packing::readFile(QString filename)
                 }
                 f.append(QRectF(x, y, w, h));
             }
-            source.append(f);
+            if (k)
+            {
+                source.append(f);
+            }
         }
         filestream >> stripWidth;
         if (stripWidth <= 0)

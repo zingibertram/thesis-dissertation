@@ -69,7 +69,8 @@ void Packing::lowBounds(bool isMaximize)
     dff1 = lb.dff_1();
     dff2 = lb.dff_2();
     dff3 = lb.dff_3();
-    dffMaximum = lb.dffMaximum(isMaximize);
+    double dm = lb.dffMaximum(isMaximize);
+    dffMaximum = dm > stripSquare ? stripSquare : dm;
 
     qDebug() << "Alg end " << t.elapsed();
 }
