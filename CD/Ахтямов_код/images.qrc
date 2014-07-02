@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>resources/proc.gif</file>
+        <file>resources/app.ico</file>
+        <file>resources/app.png</file>
+    </qresource>
+    <qresource prefix="/input">
+        <file>resources/gen.dat</file>
+        <file>resources/100_60.dat</file>
+    </qresource>
+</RCC>
